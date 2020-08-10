@@ -19,7 +19,9 @@ namespace RestSharpGLPI
 {
     public partial class Form1 : Form
     {
-       public string session = "";
+        public string pathfile = "";
+
+        public string session = "";
         public string sessionAdmin = "";
 
         public RestClient clientses ;
@@ -114,7 +116,7 @@ namespace RestSharpGLPI
         private void button3_Click(object sender, EventArgs e)
         {
             createTicket(textBox2.Text, richTextBox2.Text, "", sessionAdmin);
-            closeSession(session);
+            closeSession(sessionAdmin);
         }
 
         public void closeSession(string getsession) {
@@ -195,9 +197,13 @@ namespace RestSharpGLPI
             requestf.AddHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
             requestf.AddHeader("Accept", "application/json");
             requestf.AddHeader("Content-Type", "multipart/form-data");
-            requestf.AddQueryParameter("uploadManifest", "{\"input\": {\"name\": \"UploadFileTest_"+ idjson.ToString() + "\",\"items_id\": \"" + idjson.ToString() + "\",\"itemtype\": \"Ticket\", \"_filename\": \"TicketScrshot_102320_0823_0.png\"}}");
-            requestf.AddFile("test_"+ idjson, @"D:\TicketScrshot_102320_0823_0.png");   //            ,"items_id":76,"itemtype":"Ticket","      \"itemtype\": \"Ticket\",
+            
+                requestf.AddQueryParameter("uploadManifest", "{\"input\": {\"name\": \"UploadFileTest_" + idjson.ToString() + "\",\"items_id\": \"" + idjson.ToString() + "\",\"itemtype\": \"Ticket\", \"_filename\": \""+ pathfile + "\"}}");
 
+            // requestf.AddQueryParameter("uploadManifest", "{\"input\": {\"name\": \"UploadFileTest_"+ idjson.ToString() + "\",\"items_id\": \"" + idjson.ToString() + "\",\"itemtype\": \"Ticket\", \"_filename\": \"TicketScrshot_102320_0823_0.png\"}}");
+            // requestf.AddFile("test_"+ idjson, @"D:\TicketScrshot_102320_0823_0.png");   //            ,"items_id":76,"itemtype":"Ticket","      \"itemtype\": \"Ticket\",
+            requestf.AddFile("test_" + idjson, @"" + pathfile);
+            
             IRestResponse responsef = RSClient.Execute(requestf);
 
             var contentf = responsef.Content;
@@ -255,7 +261,7 @@ namespace RestSharpGLPI
             //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
             clientses.AddDefaultHeader("Content-Type", "application/json");
 
-            clientses.AddDefaultHeader("Session-Token", session);
+            clientses.AddDefaultHeader("Session-Token", sessionAdmin);
 
             clientses.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
             //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
@@ -328,6 +334,36 @@ namespace RestSharpGLPI
         private void button5_Click(object sender, EventArgs e)
         {
             getDocumentId("24");
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var fileContent = string.Empty;
+            var filePath = string.Empty;
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = "D:\\";
+                openFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    //Get the path of specified file
+                    filePath = openFileDialog.FileName;
+
+                    //Read the contents of the file into a stream
+                    var fileStream = openFileDialog.OpenFile();
+
+                    using (StreamReader reader = new StreamReader(fileStream))
+                    {
+                        fileContent = reader.ReadToEnd();
+                    }
+                }
+            }
+            pathfile = filePath;
+            label7.Text = filePath;// (fileContent, "File Content at path: " + filePath, MessageBoxButtons.OK);
         }
     }
 }
