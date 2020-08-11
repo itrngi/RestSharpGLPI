@@ -26,9 +26,9 @@ namespace RestSharpGLPI.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("http://192.168.16.12:81/apirest.php")]
-        public string GLPI_URL {
+        public string GLPI_URL0 {
             get {
-                return ((string)(this["GLPI_URL"]));
+                return ((string)(this["GLPI_URL0"]));
             }
         }
         
@@ -44,9 +44,9 @@ namespace RestSharpGLPI.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("wuy7FLHQZGpgpzDMqP2H8EXsE3pcmYe9PWDoYZPq")]
-        public string GLPI_APP_TOKEN {
+        public string GLPI_APP_TOKEN0 {
             get {
-                return ((string)(this["GLPI_APP_TOKEN"]));
+                return ((string)(this["GLPI_APP_TOKEN0"]));
             }
         }
         
@@ -79,10 +79,19 @@ namespace RestSharpGLPI.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string Параметр {
+        [global::System.Configuration.DefaultSettingValueAttribute("http://194.150.255.72:9781/apirest.php")]
+        public string GLPI_URL {
             get {
-                return ((string)(this["Параметр"]));
+                return ((string)(this["GLPI_URL"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("BsWfvJcGLxiDqs1YbyWEW6scOxJykmJv87tzIMSh")]
+        public string GLPI_APP_TOKEN {
+            get {
+                return ((string)(this["GLPI_APP_TOKEN"]));
             }
         }
     }

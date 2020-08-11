@@ -2,13 +2,13 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RestSharpGLPI.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="GLPI_URL" Type="System.String" Scope="Application">
+    <Setting Name="GLPI_URL0" Type="System.String" Scope="Application">
       <Value Profile="(Default)">http://192.168.16.12:81/apirest.php</Value>
     </Setting>
     <Setting Name="GLPI_SESSION_TOKEN" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="GLPI_APP_TOKEN" Type="System.String" Scope="Application">
+    <Setting Name="GLPI_APP_TOKEN0" Type="System.String" Scope="Application">
       <Value Profile="(Default)">wuy7FLHQZGpgpzDMqP2H8EXsE3pcmYe9PWDoYZPq</Value>
     </Setting>
     <Setting Name="GLPI_USER" Type="System.String" Scope="Application">
@@ -20,8 +20,11 @@
     <Setting Name="GLPI_USER_TOKEN" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="Параметр" Type="System.String" Scope="Application">
-      <Value Profile="(Default)" />
+    <Setting Name="GLPI_URL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://194.150.255.72:9781/apirest.php</Value>
+    </Setting>
+    <Setting Name="GLPI_APP_TOKEN" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">BsWfvJcGLxiDqs1YbyWEW6scOxJykmJv87tzIMSh</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -35,50 +35,54 @@ namespace RestSharpGLPI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string user = textBox3.Text;
-            string pass = textBox4.Text;
-            if (user!=string.Empty && pass != string.Empty) {
-                string _Uri = Properties.Settings.Default.GLPI_URL + "/initSession/";
+            try
+            {
+                string user = textBox3.Text;
+                string pass = textBox4.Text;
+                if (user != string.Empty && pass != string.Empty)
+                {
+                    string _Uri = Properties.Settings.Default.GLPI_URL + "/initSession/";
 
-                
 
-                // Properties.Settings.Default.GLPI_USER = user;
-                //  Properties.Settings.Default.GLPI_PASS = pass;
 
-                var client = new RestClient(_Uri);
-               // client.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
-                client.Authenticator = new HttpBasicAuthenticator(user, pass);
-                // client.AddDefaultHeader("Auth", "local");
-                client.AddDefaultHeader("Auth", "RNGI");
+                    // Properties.Settings.Default.GLPI_USER = user;
+                    //  Properties.Settings.Default.GLPI_PASS = pass;
 
-                client.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
+                    var client = new RestClient(_Uri);
+                    // client.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
+                    client.Authenticator = new HttpBasicAuthenticator(user, pass);
+                    // client.AddDefaultHeader("Auth", "local");
+                    client.AddDefaultHeader("Auth", "RNGI");
 
-                var request = new RestRequest("resource", Method.GET);
-                //  client.Execute(request);
-                IRestResponse response = client.Execute(request);
+                    client.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
 
-                //var httpResponseMessage = request.ToString();
-                // var response = new RestResponse();
+                    var request = new RestRequest("resource", Method.GET);
+                    //  client.Execute(request);
+                    IRestResponse response = client.Execute(request);
 
-               /* textBox1.Text = response.Content.ToString();
+                    //var httpResponseMessage = request.ToString();
+                    // var response = new RestResponse();
 
-                var details = Json.JsonParser.FromJson(textBox1.Text);
-                session = details["session_token"].ToString();
-                Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
-                textBox1.Text = session;// response.Content.ToString();
-                sessionConnect(session);*/
+                    /* textBox1.Text = response.Content.ToString();
 
-                  textBox1.Text = response.Content.ToString() ;
+                     var details = Json.JsonParser.FromJson(textBox1.Text);
+                     session = details["session_token"].ToString();
+                     Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
+                     textBox1.Text = session;// response.Content.ToString();
+                     sessionConnect(session);*/
 
-                  var details=Json.JsonParser.FromJson(textBox1.Text);
-                  sessionAdmin = details["session_token"].ToString();
+                    textBox1.Text = response.Content.ToString();
+
+                    var details = Json.JsonParser.FromJson(textBox1.Text);
+                    sessionAdmin = details["session_token"].ToString();
                     Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
-                  textBox1.Text = sessionAdmin;// response.Content.ToString();
-                  sessionConnect(sessionAdmin);
-                adminlogin();
-                getListUsers();
-               // listBox1.Items.Add("Start User");
-            }
+                    textBox1.Text = sessionAdmin;// response.Content.ToString();
+                    sessionConnect(sessionAdmin);
+                    adminlogin();
+                    getListUsers();
+                    // listBox1.Items.Add("Start User");
+                }
+            }catch(Exception er) { MessageBox.Show(er.Message.ToString(),"Error Login"); }
         }
 
         public void adminlogin()
