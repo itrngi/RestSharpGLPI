@@ -35,29 +35,50 @@ namespace RestSharpGLPI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string _Uri = Properties.Settings.Default.GLPI_URL + "/initSession/";
-         
-            var client = new RestClient(_Uri);
-            client.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
-          //  client.Authenticator = new HttpBasicAuthenticator("glpi", "glpi");
-           // client.AddDefaultHeader("Auth", "local");
+            string user = textBox3.Text;
+            string pass = textBox4.Text;
+            if (user!=string.Empty && pass != string.Empty) {
+                string _Uri = Properties.Settings.Default.GLPI_URL + "/initSession/";
 
-            client.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
+                
 
-            var request = new RestRequest("resource", Method.GET);
-          //  client.Execute(request);
-            IRestResponse response = client.Execute(request);
+                // Properties.Settings.Default.GLPI_USER = user;
+                //  Properties.Settings.Default.GLPI_PASS = pass;
 
-            //var httpResponseMessage = request.ToString();
-           // var response = new RestResponse();
+                var client = new RestClient(_Uri);
+               // client.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
+                client.Authenticator = new HttpBasicAuthenticator(user, pass);
+                // client.AddDefaultHeader("Auth", "local");
+                client.AddDefaultHeader("Auth", "RNGI");
 
-            textBox1.Text = response.Content.ToString() ;
+                client.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
 
-            var details=Json.JsonParser.FromJson(textBox1.Text);
-            sessionAdmin = details["session_token"].ToString();
-              Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
-            textBox1.Text = sessionAdmin;// response.Content.ToString();
-           // sessionConnect(sessionAdmin);
+                var request = new RestRequest("resource", Method.GET);
+                //  client.Execute(request);
+                IRestResponse response = client.Execute(request);
+
+                //var httpResponseMessage = request.ToString();
+                // var response = new RestResponse();
+
+               /* textBox1.Text = response.Content.ToString();
+
+                var details = Json.JsonParser.FromJson(textBox1.Text);
+                session = details["session_token"].ToString();
+                Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
+                textBox1.Text = session;// response.Content.ToString();
+                sessionConnect(session);*/
+
+                  textBox1.Text = response.Content.ToString() ;
+
+                  var details=Json.JsonParser.FromJson(textBox1.Text);
+                  sessionAdmin = details["session_token"].ToString();
+                    Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
+                  textBox1.Text = sessionAdmin;// response.Content.ToString();
+                  sessionConnect(sessionAdmin);
+                adminlogin();
+                getListUsers();
+               // listBox1.Items.Add("Start User");
+            }
         }
 
         public void adminlogin()
@@ -66,11 +87,12 @@ namespace RestSharpGLPI
             string _Uri = Properties.Settings.Default.GLPI_URL + "/initSession/";
 
             var client = new RestClient(_Uri);
-           // client.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
-             client.Authenticator = new HttpBasicAuthenticator("glpi", "glpi");
-             client.AddDefaultHeader("Auth", "local");
-
+            //  client.Authenticator = new HttpBasicAuthenticator("glpi", "glpi");
+            // client.AddDefaultHeader("Auth", "local");
+             client.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
+            client.AddDefaultHeader("Auth", "RNGI");
             client.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
+
 
             var request = new RestRequest("resource", Method.GET);
             //  client.Execute(request);
@@ -95,10 +117,9 @@ namespace RestSharpGLPI
             clientses = new RestClient(_UriT);
 
             //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
+
             clientses.AddDefaultHeader("Content-Type", "application/json");
-
             clientses.AddDefaultHeader("Session-Token", getsession);
-
             clientses.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
 
             var requestses = new RestRequest("resource", Method.GET);
@@ -153,8 +174,9 @@ namespace RestSharpGLPI
             //создание заявки
             try { 
            string _UriT = Properties.Settings.Default.GLPI_URL+ "/Ticket";
-            string JsonStringCreate = "{\"input\": [{\"name\" : \""+ theme + "\",\"content\": \"" + message + "\",\"status\": \"1\",\"type\": \"1\",\"urgency\": \"2\",\"_disablenotif\": \"true\"  }]}";
+            string JsonStringCreate = "{\"input\": [{\"name\" : \""+ theme + "\",\"content\": \"" + message + "\",\"status\": \"1\",\"type\": \"1\",\"urgency\": \"2\",\"_disablenotif\": \"true\",\"users_id_recipient\":\"101\"}]}";
                 //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
+                // ,\"users_id_recipient\":\"2\"
                 clientses = new RestClient(_UriT);
             clientses.AddDefaultHeader("Content-Type", "application/json");
             clientses.AddDefaultHeader("Session-Token", getsession);
@@ -298,12 +320,12 @@ namespace RestSharpGLPI
             //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
             clientses.AddDefaultHeader("Content-Type", "application/json");
 
-            clientses.AddDefaultHeader("Session-Token", sessionAdmin);
+            clientses.AddDefaultHeader("Session-Token", session);
 
             clientses.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
             //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
             //var requestses = new RestRequest("Ticket/" + idDOc + "/Document_Item/", Method.GET);
-            var requestses = new RestRequest("Ticket/" + idDOc + "/", Method.GET);
+            var requestses = new RestRequest("Ticket/" + idDOc + "/Ticket_User", Method.GET);
 
             //  client.Execute(request);
             IRestResponse responsesesg = clientses.Execute(requestses);
@@ -314,6 +336,127 @@ namespace RestSharpGLPI
 
             label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
             return responsesesg.Content.ToString();
+        }
+
+        public void getListUsers()
+        {
+            List<string> usersGlpi = new List<string>();
+
+            string _UriT = Properties.Settings.Default.GLPI_URL;// + idDOc;
+
+            clientses = new RestClient(_UriT);
+
+            //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
+            clientses.AddDefaultHeader("Content-Type", "application/json");
+
+            clientses.AddDefaultHeader("Session-Token", session);
+
+            clientses.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
+            //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
+            //var requestses = new RestRequest("Ticket/" + idDOc + "/Document_Item/", Method.GET);
+            var requestses = new RestRequest("User/?is_deleted=0&range=0-500&get_hateoas=0", Method.GET);
+
+            //  client.Execute(request);
+            IRestResponse responsesesg = clientses.Execute(requestses);
+
+
+
+            richTextBox1.Text = responsesesg.Content;
+
+            label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+                                                              // idjson = parseJSONArray(label6.Text);
+
+
+            listBox1.DisplayMember =  "UserName";
+            listBox1.ValueMember = "Id"; // optional depending on your needs
+           
+            listBox1.DataSource = parseJSONUserArray(responsesesg.Content.ToString());
+          //  return usersGlpi;
+        }
+
+        public List<ClassUsers> parseJSONUserArray(string jsonArray)
+        {
+            List<string> usersGlpi = new List<string>();
+            List<ClassUsers> listToBind = new List<ClassUsers>();
+
+            string res = "";
+            var jsonString = @"[{""id"":""15"",""Name"":""West Wind"",
+                        ""message"":""text""}]";
+           // jsonArray = jsonString;
+            JArray jsonVal = JArray.Parse(jsonArray) as JArray;
+            dynamic stringsJson = jsonVal;
+            try
+            {
+                foreach (dynamic stringJson in stringsJson)
+                {
+                    int name = stringJson.id;
+                    string company = stringJson.name;
+                    string phone = stringJson.phone;
+                  //  string email = stringJson.email;
+                    string realname = stringJson.realname;
+                    string firstname = stringJson.firstname;
+
+                    label5.Text = name.ToString();
+                   // res = name;
+                  //  usersGlpi.Add(name + " : " + company);
+
+                    //this.listBox1.DataSource = usersGlpi;
+                    listToBind.Add(new ClassUsers(name, company, phone, realname, firstname));
+                }
+            }
+            catch(Exception er) { MessageBox.Show(er.Message.ToString(), "parseJSONUserArray"); }
+            // listBox1.DataSource = usersGlpi;
+
+
+            return listToBind;
+        }
+
+        public void updateTicketId(string idTicket,string userid,string type)
+        {
+           
+                string result = string.Empty;
+                string fileaddres = string.Empty;
+                var idjson = "";
+                //создание заявки
+                try
+                {
+                    string _UriT = Properties.Settings.Default.GLPI_URL + "/Ticket/"+ idTicket+ "/Ticket_User/";
+                    string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"users_id\": \"" + userid + "\",\"type\": \""+type+ "\",\"use_notification\": \"1\"}]}";
+                    //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
+                    // ,\"users_id_recipient\":\"2\"
+                    clientses = new RestClient(_UriT);
+                    clientses.AddDefaultHeader("Content-Type", "application/json");
+                    clientses.AddDefaultHeader("Session-Token", sessionAdmin);
+                    clientses.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
+
+                    IRestRequest request = new RestRequest("", Method.POST, DataFormat.Json);
+                    request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
+
+                    request.AddJsonBody(JsonStringCreate);
+
+                    var response = clientses.Execute(request);
+                    Console.WriteLine("CreateTicket:");
+                    Console.WriteLine(response.Content);
+
+                    label4.Text = response.Content.ToString();
+
+
+                    // var details = Json.JsonParser.FromJson(label4.Text);
+                    idjson = parseJSONArray(label4.Text);
+                    //   var idjson = parseJSON(label4.Text);
+                    //   label5.Text= idjson;
+                    label6.Text = idjson.ToString();
+                    result = "{\"ticket_Update\": \"OK\"}";
+                }
+                catch (Exception er) { MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
+            label6.Text = result;
+
+
+
+           /* richTextBox1.Text = responsesesg.Content.ToString();
+
+            label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+            return responsesesg.Content.ToString();*/
         }
 
         public string parseJSON(string jsonSTR)
@@ -479,7 +622,7 @@ namespace RestSharpGLPI
         private void button5_Click(object sender, EventArgs e)
         {
            // getDocumentId("24");
-            getTicketId("215");
+            getTicketId(textBox5.Text);
         }
 
         void openFile(string dir, string file)
@@ -550,12 +693,22 @@ namespace RestSharpGLPI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            button1.PerformClick();
+         //   button1.PerformClick();
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
 
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            updateTicketId(textBox6.Text, textBox7.Text, textBox8.Text);
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            label13.Text = listBox1.SelectedValue.ToString();
         }
     }
 }
