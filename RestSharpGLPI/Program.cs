@@ -14,9 +14,13 @@ namespace RestSharpGLPI
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new Form1());
+            }
+            catch (Exception er) { MessageBox.Show(er.Message.ToString(),"Глобальная ошибка"); }
         }
     }
 }

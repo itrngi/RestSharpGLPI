@@ -14,12 +14,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.Json;
+using System.Drawing.Imaging;
 
 namespace RestSharpGLPI
 {
     public partial class Form1 : Form
     {
-        public string pathfile = "";
+        public string pathfile = string.Empty;
+        public string namefile = string.Empty;
+        public string fpath = Application.StartupPath.ToString();
 
         public string session = "";
         public string sessionAdmin = "";
@@ -117,6 +120,7 @@ namespace RestSharpGLPI
         {
             createTicket(textBox2.Text, richTextBox2.Text, "", sessionAdmin);
             closeSession(sessionAdmin);
+
         }
 
         public void closeSession(string getsession) {
@@ -137,15 +141,21 @@ namespace RestSharpGLPI
 
 
 
-            richTextBox1.Text = responseses.Content.ToString();
+            richTextBox1.Text ="";
+                //responseses.Content.ToString();
+
         }
         public void createTicket(string theme, string message, string screenshot, string getsession)
-        {           
-
+        {
+            string result = string.Empty;
+            string fileaddres = string.Empty;
+            var idjson="";
+            //создание заявки
+            try { 
            string _UriT = Properties.Settings.Default.GLPI_URL+ "/Ticket";
-            string JsonStringCreate = "{\"input\": [{\"name\" : \""+ theme + "\",\"content\": \"" + message + "\",\"status\": \"1\",\"type\": \"1\",\"urgency\": \"2\",\"_disablenotif\": \"true\"}]}";
-          
-            clientses = new RestClient(_UriT);
+            string JsonStringCreate = "{\"input\": [{\"name\" : \""+ theme + "\",\"content\": \"" + message + "\",\"status\": \"1\",\"type\": \"1\",\"urgency\": \"2\",\"_disablenotif\": \"true\"  }]}";
+                //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
+                clientses = new RestClient(_UriT);
             clientses.AddDefaultHeader("Content-Type", "application/json");
             clientses.AddDefaultHeader("Session-Token", getsession);
             clientses.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
@@ -163,63 +173,65 @@ namespace RestSharpGLPI
 
 
             // var details = Json.JsonParser.FromJson(label4.Text);
-            var idjson = parseJSONArray(label4.Text);
-
-         //   label5.Text= idjson;
-
-
-
-            //  string idticket = details["id"].ToString();
-            /* string idticket1 = idticket[0].ToString();
-             string idticket2 = idticket1[0].ToString();*/
-            //Console.WriteLine(string.Concat("idticket: ", res.id));
-          //  label5.Text = res.id;// response.Content.ToString();
-
-            ///upload file
-            ///
-
-            // textBox1.Text = response.Content.ToString();
-            /*
-             var details = Json.JsonParser.FromJson(label4.Text);
-             string idticket = details["id"].ToString();
-             Console.WriteLine(string.Concat("idticket: ", details["id"]));
-             label4.Text = idticket;// response.Content.ToString();
-             */
+            idjson = parseJSONArray(label4.Text);
+            //   var idjson = parseJSON(label4.Text);
+            //   label5.Text= idjson;
+            label6.Text = idjson.ToString();
+                result = "{\"ticket_add\": \"OK\"";
+            }
+            catch(Exception er) { MessageBox.Show(er.Message.ToString(),"Ошибка заявки "); }
 
 
-            
-            string _UriTf = Properties.Settings.Default.GLPI_URL + "/Document";
+            //добавление файла в заявку
 
-            var RSClient = new RestClient(_UriTf);
+            try
+            {
+                if(namefile!=string.Empty)
+                { 
+                string _UriTf = Properties.Settings.Default.GLPI_URL + "/Document";
 
-            var requestf = new RestRequest("", Method.POST);
-            requestf.AddHeader("Session-Token", getsession);
-            requestf.AddHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
-            requestf.AddHeader("Accept", "application/json");
-            requestf.AddHeader("Content-Type", "multipart/form-data");
-            
-                requestf.AddQueryParameter("uploadManifest", "{\"input\": {\"name\": \"UploadFileTest_" + idjson.ToString() + "\",\"items_id\": \"" + idjson.ToString() + "\",\"itemtype\": \"Ticket\", \"_filename\": \""+ pathfile + "\"}}");
+                var RSClient = new RestClient(_UriTf);
 
-            // requestf.AddQueryParameter("uploadManifest", "{\"input\": {\"name\": \"UploadFileTest_"+ idjson.ToString() + "\",\"items_id\": \"" + idjson.ToString() + "\",\"itemtype\": \"Ticket\", \"_filename\": \"TicketScrshot_102320_0823_0.png\"}}");
-            // requestf.AddFile("test_"+ idjson, @"D:\TicketScrshot_102320_0823_0.png");   //            ,"items_id":76,"itemtype":"Ticket","      \"itemtype\": \"Ticket\",
-            requestf.AddFile("test_" + idjson, @"" + pathfile);
-            
-            IRestResponse responsef = RSClient.Execute(requestf);
+                var requestf = new RestRequest("", Method.POST);
+                requestf.AddHeader("Session-Token", getsession);
+                requestf.AddHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
+                requestf.AddHeader("Accept", "application/json");
+                requestf.AddHeader("Content-Type", "multipart/form-data");
 
-            var contentf = responsef.Content;
-          
-            label5.Text = contentf;
+                requestf.AddQueryParameter("uploadManifest", "{\"input\": {\"name\": \"UploadFileTest_" + idjson.ToString() + "\",\"items_id\": \"" + idjson.ToString() + "\",\"itemtype\": \"Ticket\", \"_filename\": \"" + namefile + "\"}}");
 
-          //  label4.Text = responsef.Content.ToString();
+                // requestf.AddQueryParameter("uploadManifest", "{\"input\": {\"name\": \"UploadFileTest_"+ idjson.ToString() + "\",\"items_id\": \"" + idjson.ToString() + "\",\"itemtype\": \"Ticket\", \"_filename\": \"TicketScrshot_102320_0823_0.png\"}}");
+                // requestf.AddFile("test_"+ idjson, @"D:\TicketScrshot_102320_0823_0.png");   //            ,"items_id":76,"itemtype":"Ticket","      \"itemtype\": \"Ticket\",
+                requestf.AddFile("Screen_" + idjson.ToString(), @pathfile);
+
+                // MessageBox.Show(pathfile, "добавлениt файла");
 
 
-            // var details = Json.JsonParser.FromJson(label4.Text);
-            var idDOC = parseJSON(label5.Text);
-            Console.WriteLine("ID Document:");
-            Console.WriteLine(idDOC);
-            //label6.Text = idDOC;
-           
-            
+                IRestResponse responsef = RSClient.Execute(requestf);
+
+                var contentf = responsef.Content;
+
+                label5.Text = contentf;
+
+                //  label4.Text = responsef.Content.ToString();
+
+
+                // var details = Json.JsonParser.FromJson(label4.Text);
+                var idDOC = parseJSON(label5.Text);
+                Console.WriteLine("ID Document:");
+                Console.WriteLine(idDOC);
+                result += ",\"file_add\": \"" + namefile + "\"";
+            }
+            }
+            catch(Exception er) { MessageBox.Show(er.Message.ToString(),"Ошибка добавления файла"); }
+            finally { result += "}";
+                namefile = string.Empty;
+                pathfile = string.Empty;
+                
+            }
+            label6.Text = result;
+
+
             /*
               string _UriTd = Properties.Settings.Default.GLPI_URL + "/Document/"+ idDOC.ToString()+ "?expand_drodpowns=true";
             //   string JsonStringCreated = "{\"input\": [{\"name\" : \"" + theme + "\",\"content\": \"" + message + "\",\"status\": \"1\",\"type\": \"1\",\"urgency\": \"2\",\"_disablenotif\": \"true\"}]}";
@@ -277,6 +289,33 @@ namespace RestSharpGLPI
             return responsesesg.Content.ToString();
         }
 
+        public string getTicketId(string idDOc)
+        {
+            string _UriT = Properties.Settings.Default.GLPI_URL;// + idDOc;
+
+            clientses = new RestClient(_UriT);
+
+            //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
+            clientses.AddDefaultHeader("Content-Type", "application/json");
+
+            clientses.AddDefaultHeader("Session-Token", sessionAdmin);
+
+            clientses.AddDefaultHeader("App-Token", Properties.Settings.Default.GLPI_APP_TOKEN);
+            //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
+            //var requestses = new RestRequest("Ticket/" + idDOc + "/Document_Item/", Method.GET);
+            var requestses = new RestRequest("Ticket/" + idDOc + "/", Method.GET);
+
+            //  client.Execute(request);
+            IRestResponse responsesesg = clientses.Execute(requestses);
+
+
+
+            richTextBox1.Text = responsesesg.Content.ToString();
+
+            label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+            return responsesesg.Content.ToString();
+        }
+
         public string parseJSON(string jsonSTR)
         {
          /*   var jsonString = @"{""id"":""15"",""Name"":""West Wind"",
@@ -289,6 +328,112 @@ namespace RestSharpGLPI
             string company = json.Name;
            // label5.Text = name;
             return name;
+        }
+
+
+        static string GenerateRandomString()
+        {
+            bool UseSigns = true;
+            bool UseUpperLetters = true;
+            bool UseLetters = true;
+            int Length;
+            NewLabel:
+            try
+            {
+                Length = new Random(DateTime.Now.Millisecond - DateTime.Now.Second + new Random(DateTime.Now.Millisecond).Next(0, 100) / new Random(DateTime.Now.Millisecond - DateTime.Now.Second).Next(0, 10)).Next(0, 100);
+            }
+            catch { goto NewLabel; }
+            string result = "";
+            try
+            {
+                int Seed = 0;
+                char[] letters = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+                char[] signs = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+                List<char> keyWords = new List<char>();
+                List<char> upperLetters = new List<char>();
+                foreach (char c in letters)
+                    upperLetters.Add(Convert.ToChar(c.ToString().ToUpper()));
+                if (UseLetters)
+                    foreach (char c in letters)
+                        keyWords.Add(c);
+                if (UseSigns)
+                    foreach (char c in signs)
+                        keyWords.Add(c);
+                if (UseUpperLetters)
+                    foreach (char c in upperLetters)
+                        keyWords.Add(c);
+                int MaxValue = keyWords.Count;
+                for (int i = 0; i <= Length; i++)
+                {
+                    try
+                    {
+                        Random mainrand = new Random(Seed);
+                        char RandChar = keyWords[mainrand.Next(0, MaxValue)];
+                        result += RandChar;
+                        Seed += DateTime.Now.Millisecond + Seed - new Random().Next(10) + new Random(DateTime.Now.Millisecond + 800 * 989 / 3).Next(10);
+                    }
+                    catch { continue; }
+                }
+            }
+            catch { }
+            return result;
+        }
+        public string GenerateRandomJpegName()
+        {
+            DateTime date1 = new DateTime();
+            date1 = DateTime.Now;
+          string dateName= date1.ToString("dd_MM_yyyy_HH_mm_ss");
+            return "Screen_"+dateName + ".jpg";
+          //  return "Screen_" + ".jpg";
+
+            //  return GenerateRandomString() + ".jpg";
+        }
+        public void DoScreenShot()
+        {
+            Bitmap bmp = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            Graphics g = Graphics.FromImage(bmp);
+            g.CopyFromScreen(0, 0, Screen.PrimaryScreen.Bounds.X, Screen.PrimaryScreen.Bounds.Y, Screen.PrimaryScreen.Bounds.Size, CopyPixelOperation.SourceCopy);
+            namefile = GenerateRandomJpegName();
+
+            
+               
+            string filePath = @"" + fpath + "\\" + namefile;
+           
+          /*  var fileContent = string.Empty;
+            var filePath1 = string.Empty;
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = Application.StartupPath.ToString();
+                openFileDialog.Filter = "jpg files (*.jpg)|*.jpg|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
+                openFileDialog.FileName = filePath;
+              //  if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    //Get the path of specified file
+                    filePath1 = openFileDialog.FileName;
+
+                    //Read the contents of the file into a stream
+                    var fileStream = openFileDialog.OpenFile();
+
+                    using (StreamReader reader = new StreamReader(fileStream))
+                    {
+                        fileContent = reader.ReadToEnd();
+                    }
+                }
+            }
+            pathfile = filePath1;
+            */
+
+
+           
+            //openFileDialog1.FileName = filePath;
+
+            pathfile =  fpath + @"\" + namefile; // filePath;// openFileDialog1.FileName;
+            label7.Text = pathfile;
+            bmp.Save(pathfile, ImageFormat.Jpeg);
+           // openFile(fpath, namefile);
         }
 
         public string parseJSONArray(string jsonArray)
@@ -333,7 +478,39 @@ namespace RestSharpGLPI
 
         private void button5_Click(object sender, EventArgs e)
         {
-            getDocumentId("24");
+           // getDocumentId("24");
+            getTicketId("215");
+        }
+
+        void openFile(string dir, string file)
+        {
+            var fileContent = string.Empty;
+            var filePath = string.Empty;
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.InitialDirectory = dir;
+                openFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    openFileDialog.FileName = file;
+                    //Get the path of specified file
+                    filePath = openFileDialog.FileName;
+
+                    //Read the contents of the file into a stream
+                    var fileStream = openFileDialog.OpenFile();
+
+                    using (StreamReader reader = new StreamReader(fileStream))
+                    {
+                        fileContent = reader.ReadToEnd();
+                    }
+                }
+            }
+            pathfile = filePath;
+            label7.Text = pathfile;
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -363,7 +540,22 @@ namespace RestSharpGLPI
                 }
             }
             pathfile = filePath;
-            label7.Text = filePath;// (fileContent, "File Content at path: " + filePath, MessageBoxButtons.OK);
+            label7.Text = pathfile;// (fileContent, "File Content at path: " + filePath, MessageBoxButtons.OK);
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            DoScreenShot();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            button1.PerformClick();
+        }
+
+        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
+        {
+
         }
     }
 }
