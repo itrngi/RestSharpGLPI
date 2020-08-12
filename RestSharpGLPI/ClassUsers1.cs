@@ -6,18 +6,17 @@ using System.Threading.Tasks;
 
 namespace RestSharpGLPI
 {
-    public class ClassUsers
+    public class ClassUsers1
     {
         public int Id { get; set; }
         public string UserName { get; set; }
         public string UserPhone { get; set; }
        // public string UserEmail { get; set; }
-
         public string UserRealName { get; set; }
         public string UserFirstName { get; set; }
 
 
-        public ClassUsers(int id, string userName, string userPhone, /*string userEmail,*/ string userRealName, string userFirstName)
+        public ClassUsers1(int id, string userName, string userPhone, /*string userEmail,*/ string userRealName, string userFirstName)
         {
             this.Id = id;
             this.UserName = userName;
