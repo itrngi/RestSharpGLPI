@@ -104,11 +104,13 @@ namespace GlPiLibNet
                 }
                 else
                 {
+                    this.SessionAdmin = string.Empty;
                     result = "{\"loginGlpi\": \"нет данных для входа\"}";
                 }
             }
             catch (Exception er)
             {
+                this.SessionAdmin = string.Empty;
                 result = "{\"loginGlpi_error\": \"" + er.Message.ToString() + "\"}";
             }
             return result;
@@ -497,6 +499,156 @@ namespace GlPiLibNet
 
              label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
              return responsesesg.Content.ToString();*/
+        }
+
+
+        // getJsonString(string pathurl, int idItem, string itemPath)
+        public string searchTicketId(string field, string name, string pathsearch)
+    {
+            // string _UriT = this.GLPIurl;// + idDOc;
+            string _UriT = this.GLPIurl;// + "/search/" + pathsearch + "?is_deleted=0&criteria[0]["+ field+"]=" + name;// +"/ " + idTicket + "/Ticket_User/";
+
+        clientses = new RestClient(_UriT);
+
+            //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
+            clientses.AddDefaultHeader("Content-Type", "application/json");
+
+            clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
+
+            clientses.AddDefaultHeader("App-Token", this.AppTocken);
+            //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
+            //var requestses = new RestRequest("Ticket/" + idDOc + "/Document_Item/", Method.GET);
+            var requestses = new RestRequest("" + pathsearch  + "?searchText[name]="+ name+"", Method.GET);
+
+            // richTextBox1.Text = myGlpiLib.searchTicketId("name", "UsersLogin", "KnowbaseItemCategory");
+            // "search/KnowbaseItemCategory?searchText[name]=UsersLogin"
+
+            /*if (idItem != null || idItem != 0)
+                requestses = new RestRequest(pathurl + "/" + idItem + "/" + itemPath, Method.GET);
+            if (idItem == null || idItem == 0)
+                requestses = new RestRequest(pathurl + "/", Method.GET);*/
+
+            //  client.Execute(request);
+            IRestResponse responsesesg = clientses.Execute(requestses);
+
+            string resultJson = responsesesg.Content.ToString();
+
+            //label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+            // return resultJson;
+
+           // string idsearch=parseJSON(resultJson);
+            string idsearch = parseJSONArray(resultJson);
+            /* var details = Json.JsonParser.FromJson(resultJson);
+             string idsearch = details["id"].ToString();*/
+            Console.WriteLine(string.Concat("idsearch: ", idsearch));
+            
+            
+
+            return idsearch;
+        }
+
+        public string updateItemId(string Path, string idTicket, string itemPath,string fieldedit,string value)
+        {
+
+            string result = string.Empty;
+            string fileaddres = string.Empty;
+            var idjson = "";
+            //создание заявки
+            try
+            {
+                string _UriT = this.GLPIurl + "/"+Path+"/" + idTicket + "/";
+                if(itemPath!="" || itemPath!=null || itemPath!=string.Empty) _UriT+= "/" + itemPath + "/";
+
+                string JsonStringCreate = "{\"input\": [{\"id\" : \"" + idTicket + "\",\"" + fieldedit+"\" : \"" + value + "\"}]}";
+                //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
+                // ,\"users_id_recipient\":\"2\"
+                clientses = new RestClient(_UriT);
+                clientses.AddDefaultHeader("Content-Type", "application/json");
+                clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
+                clientses.AddDefaultHeader("App-Token", this.AppTocken);
+
+                IRestRequest request = new RestRequest("", Method.POST, DataFormat.Json);
+                request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
+
+                request.AddJsonBody(JsonStringCreate);
+
+                var response = clientses.Execute(request);
+                Console.WriteLine("updateItem:");
+                Console.WriteLine(response.Content);
+
+                string resultJson = response.Content.ToString();
+
+
+                // var details = Json.JsonParser.FromJson(label4.Text);
+                //  idjson = parseJSONArray(resultJson);
+                //   var idjson = parseJSON(label4.Text);
+                //   label5.Text= idjson;
+                //  label6.Text = idjson.ToString();
+                result = resultJson;// "{\"updateItemId\": \"" + idjson + "\"}";
+            }
+            catch (Exception er)
+            {
+                result = "{\"updateItemId_Error\": \"" + er.Message.ToString() + "\"}";
+                //   MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
+                // label6.Text = result;
+            }
+            return result;
+
+            /* richTextBox1.Text = responsesesg.Content.ToString();
+
+             label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+             return responsesesg.Content.ToString();*/
+        }
+
+        public string createknowbaseitem(string theme, string user, string pass, string iduser, int viewid, bool resultint_Json)
+        {
+            string result = string.Empty;
+            string fileaddres = string.Empty;
+            var idjson = "";
+            //создание заявки
+            try
+            {
+                string _UriT = this.GLPIurl + "/KnowbaseItem";
+               // string JsonStringCreate = "{\"input\": [{\"name\" : \"" + user + "\",\"answer\": \"" + pass + "\",\"is_faq\": \"0\",\"view\": \"1\",\"urgency\": \"2\",\"_disablenotif\": \"true\",\"users_id_recipient\":\"101\"}]}";
+
+                string JsonStringCreate = "{\"input\": [{\"name\" : \"" + user + "\",\"answer\": \"" + pass + "\",\"knowbaseitemcategories_id\": \""+theme+ "\",\"users_id\": \"" + iduser + "\", \"is_faq\": \"0\",\"view\": \""+ viewid.ToString()+"\" }]}";
+                //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
+                // ,\"users_id_recipient\":\"2\"
+
+                clientses = new RestClient(_UriT);
+                clientses.AddDefaultHeader("Content-Type", "application/json");
+                clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
+                clientses.AddDefaultHeader("App-Token", this.AppTocken);
+
+                IRestRequest request = new RestRequest("", Method.POST, DataFormat.Json);
+                request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
+
+                request.AddJsonBody(JsonStringCreate);
+
+                var response = clientses.Execute(request);
+                Console.WriteLine("CreateTicket:");
+                Console.WriteLine(response.Content);
+
+                string resultJsonstr = response.Content.ToString();
+
+                // var details = Json.JsonParser.FromJson(label4.Text);
+                idjson = parseJSONArray(resultJsonstr);
+                //   var idjson = parseJSON(label4.Text);
+                //   label5.Text= idjson;
+                // label6.Text = idjson.ToString();
+                if (resultint_Json)
+                    result = "{\"ticket_add\": \"" + idjson.ToString() + "\"}";
+                else result = idjson;
+            }
+            catch (Exception er)
+            {
+                //  MessageBox.Show(er.Message.ToString(), "Ошибка заявки ");
+                if (resultint_Json)
+                    result = "{\"ticket_error\": \"" + er.Message.ToString() + "\"}";
+                else result = "ticket_error: " + er.Message.ToString();
+            }
+
+            return result;
         }
 
 

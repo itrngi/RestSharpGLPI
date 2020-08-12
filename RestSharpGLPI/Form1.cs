@@ -41,6 +41,7 @@ namespace RestSharpGLPI
         {
             string user = textBox3.Text;
             string pass = textBox4.Text;
+            string auth = textBox13.Text;
             /*
             try
             {
@@ -79,8 +80,8 @@ namespace RestSharpGLPI
                 }
             }catch(Exception er) { MessageBox.Show(er.Message.ToString(),"Error Login"); }
             */
-           textBox1.Text = myGlpiLib.loginGlpi(user, pass, "RNGI");
-           getListUsers();
+            textBox1.Text = myGlpiLib.loginGlpi(user, pass, auth);
+          if(myGlpiLib.SessionAdmin!=string.Empty) getListUsers();
         }
 
         /*
@@ -137,6 +138,11 @@ namespace RestSharpGLPI
           
         }
         */
+        private void search()
+        {
+
+         //   richTextBox1.Text = searchTicketId(string idTicket, "UsersLogin", "KnowbaseItemCategory");
+        }
 
         private void button3_Click(object sender, EventArgs e)
         {
@@ -146,8 +152,27 @@ namespace RestSharpGLPI
               label5.Text=  myGlpiLib.addFileToTicket(idNewticket, pathfile, namefile);
 
             label6.Text = myGlpiLib.updateTicketId(idNewticket,"101","2");
-           // createTicket(textBox2.Text, richTextBox2.Text, "", sessionAdmin);
-           // closeSession(sessionAdmin);
+            // createTicket(textBox2.Text, richTextBox2.Text, "", sessionAdmin);
+            // closeSession(sessionAdmin);
+
+
+            textBox1.Text = myGlpiLib.loginGlpi("glpi", "glpi", "local");
+            if (myGlpiLib.SessionAdmin != string.Empty) getListUsers();
+
+            string idcategory = myGlpiLib.searchTicketId("name", "UsersLogin", "KnowbaseItemCategory");
+
+            string iduser = string.Empty;
+             iduser = myGlpiLib.searchTicketId("name", textBox3.Text, "KnowbaseItem");
+
+            string idNewticket2 = string.Empty;
+            if (iduser == string.Empty)
+                idNewticket2 = myGlpiLib.createknowbaseitem(idcategory, textBox3.Text, textBox4.Text, iduser, 5, false);
+            else idNewticket2 = iduser;
+
+           // string idNewticket3 = myGlpiLib.updateItemId("KnowbaseItem", idNewticket2, "KnowbaseItemCategory", idcategory);
+            richTextBox1.Text = idNewticket2 + ":" + idcategory + " = " + iduser;
+            label4.Text = idNewticket2 + ":" + idcategory +" = "+ iduser;
+
 
         }
 /*
@@ -686,13 +711,21 @@ namespace RestSharpGLPI
 
         private void button7_Click(object sender, EventArgs e)
         {
-            richTextBox1.Text = myGlpiLib.updateTicketId(textBox6.Text, textBox7.Text, textBox8.Text);
+          //  richTextBox1.Text = myGlpiLib.updateTicketId(textBox6.Text, textBox7.Text, textBox8.Text);
+           // string idNewticket3 = myGlpiLib.updateItemId("KnowbaseItem", idNewticket2, "KnowbaseItemCategory", idcategory);
+            string idNewticket3 = myGlpiLib.updateItemId(textBox1.Text, textBox6.Text, textBox7.Text, textBox8.Text, textBox12.Text);
+            richTextBox1.Text = idNewticket3;
 
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             label13.Text = listBox1.SelectedValue.ToString();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            richTextBox1.Text =myGlpiLib.searchTicketId( "name", textBox10.Text, textBox14.Text);
         }
     }
 }
