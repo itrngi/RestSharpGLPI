@@ -547,19 +547,112 @@ namespace GlPiLibNet
             return idsearch;
         }
 
-        public string updateItemId(string Path, string idTicket, string itemPath,string fieldedit,string value)
+        public string addUserNaznachItemId(string Path, string idTicket, string itemPath,string userId)
         {
 
             string result = string.Empty;
             string fileaddres = string.Empty;
+            string _UriT = string.Empty;
             var idjson = "";
             //создание заявки
             try
             {
-                string _UriT = this.GLPIurl + "/"+Path+"/" + idTicket + "/";
-                if(itemPath!="" || itemPath!=null || itemPath!=string.Empty) _UriT+= "/" + itemPath + "/";
+                /*
+                string _UriT0 = this.GLPIurl;
+                string _UriT = string.Empty;
+                if (itemPath == "" || itemPath == null || itemPath == string.Empty) _UriT = "/" + Path +"/" + idTicket + "/";
+                
+                if(itemPath!="" || itemPath!=null || itemPath!=string.Empty) _UriT += _UriT = "/" + Path + "/" + idTicket + "/" + itemPath + "/";
+                
+              //  string JsonStringCreate = "{\"input\": [{\"id\" : \"" + idTicket + "\",\"" + fieldedit+"\" : \"" + value + "\"}]}";
+                string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"" + fieldedit + "\" : \"" + value + "\",\"type\": \"3\"}]}";
+                */
 
-                string JsonStringCreate = "{\"input\": [{\"id\" : \"" + idTicket + "\",\"" + fieldedit+"\" : \"" + value + "\"}]}";
+                _UriT = this.GLPIurl + "/" + Path + "/" + idTicket +"/"+ itemPath + "_User";
+              //  string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"\": \"" + value + "\",\"type\": \"2\",\"use_notification\": \"1\"}]}";
+                 // string JsonStringCreate = "{ \"input\": [{ \"id\" : \""+ idTicket + "\" , \"\"" + fieldedit + "\" : \"" + value + "\"\" } ] }";
+                 //
+                //  string JsonStringCreate = "{ \"input\": {\""+ idname + "\" : \"" + idTicket + "\",\"name\" : \"" + "test" + "\",\"knowbaseitems_id\":\"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\",\"users_id\":2,\"type\": \"3\" }}";
+              //  string JsonStringCreate = "{ \"input\": {\"item_id\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\" }}";
+              // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\" }]}";
+               string JsonStringCreate = "{\"input\": {\"knowbaseitem_id\" : \"" + idTicket + "\",\"users_id\": \"2\"}}";
+
+                //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
+                // ,\"users_id_recipient\":\"2\"
+                clientses = new RestClient(_UriT);
+                    clientses.AddDefaultHeader("Content-Type", "application/json");
+                    clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
+                    clientses.AddDefaultHeader("App-Token", this.AppTocken);
+
+                   // IRestRequest request = new RestRequest("", Method.PUT, DataFormat.Json);
+                IRestRequest request = new RestRequest("", Method.POST, DataFormat.Json);
+
+                request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
+
+                    request.AddJsonBody(JsonStringCreate);
+                Console.WriteLine("AddJsonBody:");
+                Console.WriteLine(request.Resource);
+
+                var response = clientses.Execute(request);
+                    Console.WriteLine("addUserNaznachItemId:");
+                    Console.WriteLine(response.Content);
+
+                    string resultJson = response.Content.ToString();
+
+
+                    // var details = Json.JsonParser.FromJson(label4.Text);
+                    idjson = parseJSONArray(resultJson);
+                    //   var idjson = parseJSON(label4.Text);
+                    //   label5.Text= idjson;
+                    //  label6.Text = idjson.ToString();
+                    result = "{\"addUserNaznachItemId_Update\": \"" + idjson + "\"}"+ _UriT;
+               
+            }
+            catch (Exception er)
+            {
+                result = "{\"addUserNaznachItemId_Error\": \"" + er.Message.ToString() + "\"}" + _UriT;
+                //   MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
+                // label6.Text = result;
+            }
+            return result;
+
+            /* richTextBox1.Text = responsesesg.Content.ToString();
+
+             label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+             return responsesesg.Content.ToString();*/
+        }
+
+        public string updateItemId(string Path, string idname, string idTicket, string itemPath, string fieldedit, string value)
+        {
+
+            string result = string.Empty;
+            string fileaddres = string.Empty;
+            string _UriT = string.Empty;
+            var idjson = "";
+            //создание заявки
+            try
+            {
+                /*
+                string _UriT0 = this.GLPIurl;
+                string _UriT = string.Empty;
+                if (itemPath == "" || itemPath == null || itemPath == string.Empty) _UriT = "/" + Path +"/" + idTicket + "/";
+                
+                if(itemPath!="" || itemPath!=null || itemPath!=string.Empty) _UriT += _UriT = "/" + Path + "/" + idTicket + "/" + itemPath + "/";
+                
+              //  string JsonStringCreate = "{\"input\": [{\"id\" : \"" + idTicket + "\",\"" + fieldedit+"\" : \"" + value + "\"}]}";
+                string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"" + fieldedit + "\" : \"" + value + "\",\"type\": \"3\"}]}";
+                */
+
+                _UriT = this.GLPIurl + "/" + Path + "/" + idTicket + "/" + itemPath;
+                //  string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"\": \"" + value + "\",\"type\": \"2\",\"use_notification\": \"1\"}]}";
+                // string JsonStringCreate = "{ \"input\": [{ \"id\" : \""+ idTicket + "\" , \"\"" + fieldedit + "\" : \"" + value + "\"\" } ] }";
+                //
+             // string JsonStringCreate = "{ \"input\": {\""+ idname + "\" : \"" + idTicket + "\",\"name\" : \"" + "test" + "\",\"knowbaseitems_id\":\"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\",\"users_id\":2,\"type\": \"3\" }}";               
+                string JsonStringCreate = "{ \"input\": {\"" + idname + "\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\" }}";
+               
+                // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\" }]}";
+               // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\",\"use_notification\": \"1\"}]}";
+
                 //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
                 // ,\"users_id_recipient\":\"2\"
                 clientses = new RestClient(_UriT);
@@ -567,28 +660,33 @@ namespace GlPiLibNet
                 clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
                 clientses.AddDefaultHeader("App-Token", this.AppTocken);
 
-                IRestRequest request = new RestRequest("", Method.POST, DataFormat.Json);
+                 IRestRequest request = new RestRequest("", Method.PUT, DataFormat.Json);
+               // IRestRequest request = new RestRequest("", Method.POST, DataFormat.Json);
+
                 request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
 
                 request.AddJsonBody(JsonStringCreate);
+                Console.WriteLine("AddJsonBody:");
+                Console.WriteLine(request.Resource);
 
                 var response = clientses.Execute(request);
-                Console.WriteLine("updateItem:");
+                Console.WriteLine("updateItemId:");
                 Console.WriteLine(response.Content);
 
                 string resultJson = response.Content.ToString();
 
 
                 // var details = Json.JsonParser.FromJson(label4.Text);
-                //  idjson = parseJSONArray(resultJson);
+                idjson = parseJSONArray(resultJson);
                 //   var idjson = parseJSON(label4.Text);
                 //   label5.Text= idjson;
                 //  label6.Text = idjson.ToString();
-                result = resultJson;// "{\"updateItemId\": \"" + idjson + "\"}";
+                result = "{\"updateItemId_Update\": \"" + idjson + "\"}" + _UriT;
+
             }
             catch (Exception er)
             {
-                result = "{\"updateItemId_Error\": \"" + er.Message.ToString() + "\"}";
+                result = "{\"updateItemId_Error\": \"" + er.Message.ToString() + "\"}" + _UriT;
                 //   MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
                 // label6.Text = result;
             }
@@ -616,6 +714,7 @@ namespace GlPiLibNet
                 // ,\"users_id_recipient\":\"2\"
 
                 clientses = new RestClient(_UriT);
+                
                 clientses.AddDefaultHeader("Content-Type", "application/json");
                 clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
                 clientses.AddDefaultHeader("App-Token", this.AppTocken);

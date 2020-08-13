@@ -71,6 +71,10 @@
             this.label16 = new System.Windows.Forms.Label();
             this.textBox13 = new System.Windows.Forms.TextBox();
             this.textBox14 = new System.Windows.Forms.TextBox();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
+            this.textBox15 = new System.Windows.Forms.TextBox();
+            this.button9 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -237,7 +241,7 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(100, 20);
             this.textBox3.TabIndex = 17;
-            this.textBox3.Text = "meegopad10";
+            this.textBox3.Text = "glpi";
             // 
             // textBox4
             // 
@@ -246,7 +250,7 @@
             this.textBox4.PasswordChar = '*';
             this.textBox4.Size = new System.Drawing.Size(100, 20);
             this.textBox4.TabIndex = 18;
-            this.textBox4.Text = "mywYsZC12";
+            this.textBox4.Text = "glpi";
             // 
             // label8
             // 
@@ -296,6 +300,7 @@
             this.textBox7.Name = "textBox7";
             this.textBox7.Size = new System.Drawing.Size(100, 20);
             this.textBox7.TabIndex = 24;
+            this.textBox7.Text = "knowbaseitem_User";
             // 
             // textBox8
             // 
@@ -303,6 +308,7 @@
             this.textBox8.Name = "textBox8";
             this.textBox8.Size = new System.Drawing.Size(100, 20);
             this.textBox8.TabIndex = 25;
+            this.textBox8.Text = "users_id";
             // 
             // label10
             // 
@@ -400,6 +406,7 @@
             this.textBox11.Name = "textBox11";
             this.textBox11.Size = new System.Drawing.Size(100, 20);
             this.textBox11.TabIndex = 35;
+            this.textBox11.Text = "knowbaseitem";
             // 
             // label15
             // 
@@ -432,7 +439,7 @@
             this.textBox13.Name = "textBox13";
             this.textBox13.Size = new System.Drawing.Size(100, 20);
             this.textBox13.TabIndex = 39;
-            this.textBox13.Text = "RNGI";
+            this.textBox13.Text = "local";
             // 
             // textBox14
             // 
@@ -441,11 +448,36 @@
             this.textBox14.Size = new System.Drawing.Size(75, 20);
             this.textBox14.TabIndex = 41;
             // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            // 
+            // textBox15
+            // 
+            this.textBox15.Location = new System.Drawing.Point(119, 412);
+            this.textBox15.Name = "textBox15";
+            this.textBox15.Size = new System.Drawing.Size(100, 20);
+            this.textBox15.TabIndex = 42;
+            // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(344, 414);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(100, 23);
+            this.button9.TabIndex = 43;
+            this.button9.Text = "addUserNaznach";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1206, 450);
+            this.Controls.Add(this.button9);
+            this.Controls.Add(this.textBox15);
             this.Controls.Add(this.textBox14);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.textBox13);
@@ -542,6 +574,10 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.TextBox textBox13;
         private System.Windows.Forms.TextBox textBox14;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.ComponentModel.BackgroundWorker backgroundWorker2;
+        private System.Windows.Forms.TextBox textBox15;
+        private System.Windows.Forms.Button button9;
     }
 }
 
