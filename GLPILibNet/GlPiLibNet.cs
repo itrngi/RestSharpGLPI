@@ -24,6 +24,11 @@ namespace GlPiLibNet
 
     public class GlPiLibNet
     {
+        public string SaUserName { get; set; }
+        public string SaUserPass { get; set; }
+        public string SaAuthType { get; set; }
+        public string SaSession { get; set; }
+
 
         public string UserName { get; set; }
         public string UserPass { get; set; }
@@ -38,7 +43,8 @@ namespace GlPiLibNet
         public string Fpath { get; set; }
         public string Session { get; set; }
         public string SessionAdmin { get; set; }
-        public RestClient clientses;
+       // public RestClient clientses;
+
 
         public string ErrorLib { get; set; }
 
@@ -62,25 +68,30 @@ namespace GlPiLibNet
             this.AuthType = authType;*/
             this.AppTocken = appTocken;
             this.GLPIurl = glpiUrl;
+            this.SessionAdmin = string.Empty;
+            this.SaSession = string.Empty;
         }
 
-        public string loginGlpi(string user, string pass, string authType/*, string appTocken*/)
-        {
-            string result = string.Empty;
-            this.UserName = user;
-            this.UserPass = pass;
-            this.AuthType = authType;
 
+        private string loginGlpiSA()
+
+        {
+            Console.WriteLine(string.Concat("loginGlpiSA()"));
+            string result = string.Empty;
+              this.SaUserName = "glpi";
+              this.SaUserPass = "glpi";
+              this.SaAuthType = "local";
+              
             try
             {
-                if (user != string.Empty && pass != string.Empty)
+                if (this.UserName != string.Empty && this.UserPass != string.Empty)
                 {
                     string _Uri = this.GLPIurl + "/initSession/";
                     var client = new RestClient(_Uri);
                     // client.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
-                    client.Authenticator = new HttpBasicAuthenticator(user, pass);
+                    client.Authenticator = new HttpBasicAuthenticator(this.SaUserName, this.SaUserPass);
                     // client.AddDefaultHeader("Auth", "local");
-                    client.AddDefaultHeader("Auth", this.AuthType);
+                    client.AddDefaultHeader("Auth", this.SaAuthType);
                     client.AddDefaultHeader("App-Token", this.AppTocken);
                     var request = new RestRequest("resource", Method.GET);
                     IRestResponse response = client.Execute(request);
@@ -88,7 +99,7 @@ namespace GlPiLibNet
                     string resultJson = response.Content.ToString();
 
                     var details = Json.JsonParser.FromJson(resultJson);
-                    this.SessionAdmin = details["session_token"].ToString();
+                    this.SaSession = details["session_token"].ToString();
                     Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
                     // textBox1.Text = sessionAdmin;// response.Content.ToString();
                     sessionConnect(this.SessionAdmin);
@@ -116,15 +127,87 @@ namespace GlPiLibNet
             return result;
         }
 
-        public void closeSession(string getsession)
+        // public string loginGlpi(string user, string pass, string authType/*, string appTocken*/)
+        public string loginGlpi()
+
         {
+            Console.WriteLine(string.Concat("loginGlpi()"));
+            string result = string.Empty;
+          /*  this.UserName = user;
+            this.UserPass = pass;
+            this.AuthType = authType;
+            */
+            try
+            {
+                if (this.UserName != string.Empty && this.UserPass != string.Empty)
+                {
+                    string _Uri = this.GLPIurl + "/initSession/";
+                    var client = new RestClient(_Uri);
+                    // client.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
+                    client.Authenticator = new HttpBasicAuthenticator(this.UserName, this.UserPass);
+                    // client.AddDefaultHeader("Auth", "local");
+                    client.AddDefaultHeader("Auth", this.AuthType);
+                    client.AddDefaultHeader("App-Token", this.AppTocken);
+                    var request = new RestRequest("resource", Method.GET);
+                    IRestResponse response = client.Execute(request);
+
+                    string resultJson = response.Content.ToString();
+
+                    var details = Json.JsonParser.FromJson(resultJson);
+                    this.SessionAdmin = details["session_token"].ToString();
+                    Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
+                    // textBox1.Text = sessionAdmin;// response.Content.ToString();
+                    sessionConnect(this.SessionAdmin);
+
+                    // adminlogin();
+                    // getListUsers();
+                    // listBox1.Items.Add("Start User");
+                    result = "{\"loginGlpi\": \"" + this.SessionAdmin + "\"}";
+
+
+                    //  MessageBox.Show(er.Message.ToString(), "Ошибка заявки ");
+                  
+                }
+                else
+                {
+                    this.SessionAdmin = string.Empty;
+                    result = "{\"loginGlpi\": \"нет данных для входа\"}";
+                }
+            }
+            catch (Exception er)
+            {
+                this.SessionAdmin = string.Empty;
+                result = "{\"loginGlpi_error\": \"" + er.Message.ToString() + "\"}";
+            }
+            finally { if (this.SessionAdmin != string.Empty) this.SessionConnectResult = "Подключен"; else this.SessionConnectResult = "Отключен"; }
+            return result;
+        }
+
+       // public void closeSession(string getsession)
+             public void closeSession()
+        {
+            Console.WriteLine(string.Concat("closeSession()"));
             string _UriT = this.GLPIurl + "/killSession/";
-            clientses = new RestClient(_UriT);
+            var clientses = new RestClient(_UriT);
             clientses.AddDefaultHeader("Content-Type", "application/json");
-            clientses.AddDefaultHeader("Session-Token", getsession);
+            clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);// getsession);
             clientses.AddDefaultHeader("App-Token", this.AppTocken);
             var requestses = new RestRequest("resource", Method.GET);
             IRestResponse responseses = clientses.Execute(requestses);
+            this.SessionAdmin = string.Empty;
+        }
+
+        public void closeSessionSA()
+        {
+            Console.WriteLine(string.Concat("closeSessionSA()"));
+            string _UriT = this.GLPIurl + "/killSession/";
+            var clientses = new RestClient(_UriT);
+            clientses.AddDefaultHeader("Content-Type", "application/json");
+            clientses.AddDefaultHeader("Session-Token", this.SaSession);// getsession);
+            clientses.AddDefaultHeader("App-Token", this.AppTocken);
+            var requestses = new RestRequest("resource", Method.GET);
+            IRestResponse responseses = clientses.Execute(requestses);
+            this.SaSession = string.Empty;
         }
 
         /* private void adminlogin()
@@ -158,8 +241,9 @@ namespace GlPiLibNet
 
         private void sessionConnect(string getsession)
         {
+            Console.WriteLine(string.Concat("sessionConnect()"));
             string _UriT = this.GLPIurl + "/Ticket/";
-            clientses = new RestClient(_UriT);
+            var clientses = new RestClient(_UriT);
 
             //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
 
@@ -179,14 +263,16 @@ namespace GlPiLibNet
 
         public string getTicketId(string idDOc)
         {
+            Console.WriteLine(string.Concat("getTicketId()"));
+            loginGlpiSA();
             string _UriT = this.GLPIurl;// + idDOc;
 
-            clientses = new RestClient(_UriT);
+            var clientses = new RestClient(_UriT);
 
             //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
             clientses.AddDefaultHeader("Content-Type", "application/json");
 
-            clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
+            clientses.AddDefaultHeader("Session-Token", this.SaSession);
 
             clientses.AddDefaultHeader("App-Token", this.AppTocken);
             //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
@@ -202,12 +288,15 @@ namespace GlPiLibNet
 
             //label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
             return resultJson;
+            closeSessionSA();
         }
         public string getJsonString(string pathurl, int idItem, string itemPath)
         {
+            Console.WriteLine(string.Concat("getJsonString()"));
+            // loginGlpi();
             string _UriT = this.GLPIurl;// + idDOc;
 
-            clientses = new RestClient(_UriT);
+            var clientses = new RestClient(_UriT);
 
             //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
             clientses.AddDefaultHeader("Content-Type", "application/json");
@@ -217,7 +306,7 @@ namespace GlPiLibNet
             clientses.AddDefaultHeader("App-Token", this.AppTocken);
             //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
             //var requestses = new RestRequest("Ticket/" + idDOc + "/Document_Item/", Method.GET);
-            var requestses = new RestRequest(pathurl + "/" + idItem + "/" + itemPath, Method.GET);
+            var requestses = new RestRequest(pathurl + "/" + idItem + "/" , Method.GET);
             if (idItem != null || idItem != 0)
                 requestses = new RestRequest(pathurl + "/" + idItem + "/" + itemPath, Method.GET);
             if (idItem == null || idItem == 0)
@@ -229,6 +318,7 @@ namespace GlPiLibNet
             string resultJson = responsesesg.Content.ToString();
 
             //label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+           // closeSession();
             return resultJson;
             /* var details = Json.JsonParser.FromJson(textBox1.Text);
              session = details["session_token"].ToString();
@@ -239,6 +329,7 @@ namespace GlPiLibNet
 
         public List<ClassUsers> parseJSONUserArray(string jsonArray)
         {
+            Console.WriteLine(string.Concat("parseJSONUserArray()"));
             List<string> usersGlpi = new List<string>();
             List<ClassUsers> listToBind = new List<ClassUsers>();
 
@@ -278,12 +369,14 @@ namespace GlPiLibNet
         }
         public List<ClassUsers> getListUsers()
         {
+            Console.WriteLine(string.Concat("getListUsers()"));
+            loginGlpiSA();
             List<ClassUsers> usersGlpi = new List<ClassUsers>();
             string _UriT = this.GLPIurl;// + idDOc;
-            clientses = new RestClient(_UriT);
+            var clientses = new RestClient(_UriT);
             //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
             clientses.AddDefaultHeader("Content-Type", "application/json");
-            clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
+            clientses.AddDefaultHeader("Session-Token", this.SaSession);
             clientses.AddDefaultHeader("App-Token", this.AppTocken);
             //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
             //var requestses = new RestRequest("Ticket/" + idDOc + "/Document_Item/", Method.GET);
@@ -300,6 +393,7 @@ namespace GlPiLibNet
             */
 
             usersGlpi= parseJSONUserArray(responsesesg.Content.ToString());
+            closeSessionSA();
               return usersGlpi;
         }
     
@@ -308,6 +402,7 @@ namespace GlPiLibNet
 
         public string parseJSON(string jsonSTR)
         {
+            Console.WriteLine(string.Concat("parseJSON()"));
             /*   var jsonString = @"{""id"":""15"",""Name"":""West Wind"",
                            ""message"":""text""}";
                */
@@ -317,11 +412,13 @@ namespace GlPiLibNet
             string name = json.id;
             string company = json.Name;
             // label5.Text = name;
+            Console.WriteLine(string.Concat("parseJSON: ", name));
             return name;
         }
 
         public string parseJSONArray(string jsonArray)
         {
+            Console.WriteLine(string.Concat("parseJSONArray()"));
             string res = "";
             var jsonString = @"{""id"":""15"",""Name"":""West Wind"",
                         ""message"":""text""}";
@@ -336,11 +433,14 @@ namespace GlPiLibNet
                 //  label5.Text = name;
                 res = name;
             }
+            Console.WriteLine(string.Concat("parseJSONArray: ", res));
             return res;
         }
 
         public string createTicket(string theme, string message, bool resultint_Json)
         {
+            Console.WriteLine(string.Concat("createTicket()"));
+            loginGlpi();
             string result = string.Empty;
             string fileaddres = string.Empty;
             var idjson = "";
@@ -352,7 +452,7 @@ namespace GlPiLibNet
                 //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
                 // ,\"users_id_recipient\":\"2\"
 
-                clientses = new RestClient(_UriT);
+                var clientses = new RestClient(_UriT);
                 clientses.AddDefaultHeader("Content-Type", "application/json");
                 clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
                 clientses.AddDefaultHeader("App-Token", this.AppTocken);
@@ -369,6 +469,8 @@ namespace GlPiLibNet
                 string resultJsonstr = response.Content.ToString();
 
                 // var details = Json.JsonParser.FromJson(label4.Text);
+                Console.WriteLine(string.Concat("CreateTicket_parseJSONArray: ", resultJsonstr));
+
                 idjson = parseJSONArray(resultJsonstr);
                 //   var idjson = parseJSON(label4.Text);
                 //   label5.Text= idjson;
@@ -384,12 +486,15 @@ namespace GlPiLibNet
                     result = "{\"ticket_error\": \"" + er.Message.ToString() + "\"}";
                 else result = "ticket_error: " + er.Message.ToString();
             }
+            finally { closeSession(); }
 
             return result;
         }
 
         public string addFileToTicket(string ticketID, string pathfile, string namefile)
         {
+            Console.WriteLine(string.Concat("addFileToTicket()"));
+            loginGlpi();
             //добавление файла в заявку
             string result = string.Empty;
             try
@@ -444,7 +549,7 @@ namespace GlPiLibNet
 
                 namefile = string.Empty;
                 pathfile = string.Empty;
-
+                 closeSession();
             }
             return result;
 
@@ -452,18 +557,20 @@ namespace GlPiLibNet
 
         public string updateTicketId(string idTicket, string userid, string type)
         {
+            Console.WriteLine(string.Concat("updateTicketId()"));
 
             string result = string.Empty;
             string fileaddres = string.Empty;
             var idjson = "";
             //создание заявки
             try
-            {
+             {
+            loginGlpi();
                 string _UriT = this.GLPIurl + "/Ticket/" + idTicket + "/Ticket_User/";
-                string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"users_id\": \"" + userid + "\",\"type\": \"" + type + "\",\"use_notification\": \"1\"}]}";
+                string JsonStringCreate = "{\"input\": {\"tickets_id\" : \"" + idTicket + "\",\"users_id\": \"" + userid + "\",\"type\": \"" + type + "\",\"use_notification\": \"1\"}}";
                 //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
                 // ,\"users_id_recipient\":\"2\"
-                clientses = new RestClient(_UriT);
+                var clientses = new RestClient(_UriT);
                 clientses.AddDefaultHeader("Content-Type", "application/json");
                 clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
                 clientses.AddDefaultHeader("App-Token", this.AppTocken);
@@ -472,27 +579,35 @@ namespace GlPiLibNet
                 request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
 
                 request.AddJsonBody(JsonStringCreate);
+                Console.WriteLine(string.Concat("updateTicketJSON: ", JsonStringCreate));
 
                 var response = clientses.Execute(request);
-                Console.WriteLine("CreateTicket:");
+                Console.WriteLine("updateTicket:");
                 Console.WriteLine(response.Content);
 
                 string resultJson = response.Content.ToString();
 
+                Console.WriteLine(string.Concat("updateTicket_parse: ", resultJson));
 
                 // var details = Json.JsonParser.FromJson(label4.Text);
-                idjson = parseJSONArray(resultJson);
+                //   idjson = parseJSONArray(resultJson);
+              //  idjson = parseJSON(resultJson);
+
                 //   var idjson = parseJSON(label4.Text);
                 //   label5.Text= idjson;
                 //  label6.Text = idjson.ToString();
-                result = "{\"ticket_Update\": \"" + idjson + "\"}";
-            }
-            catch (Exception er)
-            {
-                result = "{\"ticket_Update_Error\": \"" + er.Message.ToString() + "\"}";
-                //   MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
-                // label6.Text = result;
-            }
+             //   result = "{\"ticket_Update\": \"" + idjson + "\"}";
+            result = "{\"ticket_Update\": \"ok\"}";
+
+              }
+              catch (Exception er)
+              {
+                  result = "{\"ticket_Update_Error\": \"" + er.Message.ToString() + "\"}";
+                  //   MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
+                  // label6.Text = result;
+              }
+              finally 
+            { closeSessionSA(); }
             return result;
 
             /* richTextBox1.Text = responsesesg.Content.ToString();
@@ -505,15 +620,18 @@ namespace GlPiLibNet
         // getJsonString(string pathurl, int idItem, string itemPath)
         public string searchTicketId(string field, string name, string pathsearch)
     {
+            Console.WriteLine(string.Concat("searchTicketId()"));
+
+            loginGlpiSA();
             // string _UriT = this.GLPIurl;// + idDOc;
             string _UriT = this.GLPIurl;// + "/search/" + pathsearch + "?is_deleted=0&criteria[0]["+ field+"]=" + name;// +"/ " + idTicket + "/Ticket_User/";
 
-        clientses = new RestClient(_UriT);
+        var clientses = new RestClient(_UriT);
 
             //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
             clientses.AddDefaultHeader("Content-Type", "application/json");
 
-            clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
+            clientses.AddDefaultHeader("Session-Token", this.SaSession);
 
             clientses.AddDefaultHeader("App-Token", this.AppTocken);
             //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
@@ -535,21 +653,23 @@ namespace GlPiLibNet
 
             //label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
             // return resultJson;
-
-           // string idsearch=parseJSON(resultJson);
+            Console.WriteLine(string.Concat("searchTicketId_parse: ", resultJson));
+            // string idsearch=parseJSON(resultJson);
             string idsearch = parseJSONArray(resultJson);
             /* var details = Json.JsonParser.FromJson(resultJson);
              string idsearch = details["id"].ToString();*/
             Console.WriteLine(string.Concat("idsearch: ", idsearch));
-            
-            
+
+
+             closeSessionSA(); 
 
             return idsearch;
         }
 
-        public string addUserNaznachItemId(string Path, string idTicket, string itemPath,string userId)
+        public string addUserNaznachItemId(string Path, string idTicket, string userId)
         {
-
+            Console.WriteLine(string.Concat("addUserNaznachItemId()"));
+            loginGlpiSA();
             string result = string.Empty;
             string fileaddres = string.Empty;
             string _UriT = string.Empty;
@@ -568,40 +688,41 @@ namespace GlPiLibNet
                 string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"" + fieldedit + "\" : \"" + value + "\",\"type\": \"3\"}]}";
                 */
 
-                _UriT = this.GLPIurl + "/" + Path + "/" + idTicket +"/"+ itemPath + "_User";
+                _UriT = this.GLPIurl + "/" + Path + "/" + idTicket +"/"+ Path + "_User/";
               //  string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"\": \"" + value + "\",\"type\": \"2\",\"use_notification\": \"1\"}]}";
                  // string JsonStringCreate = "{ \"input\": [{ \"id\" : \""+ idTicket + "\" , \"\"" + fieldedit + "\" : \"" + value + "\"\" } ] }";
                  //
                 //  string JsonStringCreate = "{ \"input\": {\""+ idname + "\" : \"" + idTicket + "\",\"name\" : \"" + "test" + "\",\"knowbaseitems_id\":\"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\",\"users_id\":2,\"type\": \"3\" }}";
               //  string JsonStringCreate = "{ \"input\": {\"item_id\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\" }}";
               // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\" }]}";
-               string JsonStringCreate = "{\"input\": {\"knowbaseitem_id\" : \"" + idTicket + "\",\"users_id\": \"2\"}}";
+             
+                //  string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\"users_id\": \""+ userId + "\"}]}";
+                string JsonStringCreate = "{ \"input\": {\"" + "knowbaseitem_id" + "\" : \"" + idTicket + "\",\"" + "users_id" + "\": \"" + userId + "\" }}";
 
                 //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
                 // ,\"users_id_recipient\":\"2\"
-                clientses = new RestClient(_UriT);
-                    clientses.AddDefaultHeader("Content-Type", "application/json");
-                    clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
-                    clientses.AddDefaultHeader("App-Token", this.AppTocken);
+                var clientses = new RestClient(_UriT);
+                clientses.AddDefaultHeader("Content-Type", "application/json");
+                clientses.AddDefaultHeader("Session-Token", this.SaSession);
+                clientses.AddDefaultHeader("App-Token", this.AppTocken);
 
-                   // IRestRequest request = new RestRequest("", Method.PUT, DataFormat.Json);
+
+                // IRestRequest request = new RestRequest("", Method.PUT, DataFormat.Json);
                 IRestRequest request = new RestRequest("", Method.POST, DataFormat.Json);
 
                 request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
 
-                    request.AddJsonBody(JsonStringCreate);
-                Console.WriteLine("AddJsonBody:");
-                Console.WriteLine(request.Resource);
+                request.AddJsonBody(JsonStringCreate);
+              //  Console.WriteLine("AddJsonBody:");
+               // Console.WriteLine(request.Resource);
 
-                var response = clientses.Execute(request);
+                    var response = clientses.Execute(request);
                     Console.WriteLine("addUserNaznachItemId:");
                     Console.WriteLine(response.Content);
-
                     string resultJson = response.Content.ToString();
-
-
-                    // var details = Json.JsonParser.FromJson(label4.Text);
-                    idjson = parseJSONArray(resultJson);
+                // var details = Json.JsonParser.FromJson(label4.Text);
+                Console.WriteLine(string.Concat("addUserNaznachItemId_parse: ", resultJson));
+                idjson = parseJSONArray(resultJson);
                     //   var idjson = parseJSON(label4.Text);
                     //   label5.Text= idjson;
                     //  label6.Text = idjson.ToString();
@@ -614,6 +735,7 @@ namespace GlPiLibNet
                 //   MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
                 // label6.Text = result;
             }
+            finally { closeSessionSA(); }
             return result;
 
             /* richTextBox1.Text = responsesesg.Content.ToString();
@@ -622,9 +744,10 @@ namespace GlPiLibNet
              return responsesesg.Content.ToString();*/
         }
 
-        public string updateItemId(string Path, string idname, string idTicket, string itemPath, string fieldedit, string value)
+        public string updateItemId(string Path, string idname, string idTicket, string itemPath, string fieldedit, string value,bool addorupdate)
         {
-
+            Console.WriteLine(string.Concat("updateItemId()"));
+            loginGlpiSA();
             string result = string.Empty;
             string fileaddres = string.Empty;
             string _UriT = string.Empty;
@@ -647,21 +770,30 @@ namespace GlPiLibNet
                 //  string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"\": \"" + value + "\",\"type\": \"2\",\"use_notification\": \"1\"}]}";
                 // string JsonStringCreate = "{ \"input\": [{ \"id\" : \""+ idTicket + "\" , \"\"" + fieldedit + "\" : \"" + value + "\"\" } ] }";
                 //
-             // string JsonStringCreate = "{ \"input\": {\""+ idname + "\" : \"" + idTicket + "\",\"name\" : \"" + "test" + "\",\"knowbaseitems_id\":\"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\",\"users_id\":2,\"type\": \"3\" }}";               
+                // string JsonStringCreate = "{ \"input\": {\""+ idname + "\" : \"" + idTicket + "\",\"name\" : \"" + "test" + "\",\"knowbaseitems_id\":\"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\",\"users_id\":2,\"type\": \"3\" }}";               
                 string JsonStringCreate = "{ \"input\": {\"" + idname + "\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\" }}";
-               
+
                 // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\" }]}";
-               // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\",\"use_notification\": \"1\"}]}";
+                // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\",\"use_notification\": \"1\"}]}";
 
                 //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
                 // ,\"users_id_recipient\":\"2\"
-                clientses = new RestClient(_UriT);
+                var clientses = new RestClient(_UriT);
                 clientses.AddDefaultHeader("Content-Type", "application/json");
                 clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
                 clientses.AddDefaultHeader("App-Token", this.AppTocken);
 
-                 IRestRequest request = new RestRequest("", Method.PUT, DataFormat.Json);
-               // IRestRequest request = new RestRequest("", Method.POST, DataFormat.Json);
+
+                IRestRequest request;
+                //  IRestRequest request = new RestRequest("", Method.PUT, DataFormat.Json);
+                if (addorupdate)
+                {
+                    request = new RestRequest("", Method.POST, DataFormat.Json);
+                }
+                else
+                {
+                    request = new RestRequest("", Method.PUT, DataFormat.Json);
+                }
 
                 request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
 
@@ -677,19 +809,114 @@ namespace GlPiLibNet
 
 
                 // var details = Json.JsonParser.FromJson(label4.Text);
-                idjson = parseJSONArray(resultJson);
+                idjson = parseJSON(resultJson);
                 //   var idjson = parseJSON(label4.Text);
                 //   label5.Text= idjson;
                 //  label6.Text = idjson.ToString();
-                result = "{\"updateItemId_Update\": \"" + idjson + "\"}" + _UriT;
+                result = "{\"updateItemId_Update\": \"" + idjson + "\"}" + _UriT + "  JSON{ " + JsonStringCreate + "} " + addorupdate.ToString();
 
             }
             catch (Exception er)
             {
-                result = "{\"updateItemId_Error\": \"" + er.Message.ToString() + "\"}" + _UriT;
+                result = "{\"updateItemId_Error\": \"" + er.Message.ToString() + "\"} " + addorupdate.ToString() + "   " + _UriT;
                 //   MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
                 // label6.Text = result;
             }
+            finally { closeSessionSA(); }
+            return result;
+
+            /* richTextBox1.Text = responsesesg.Content.ToString();
+
+             label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+             return responsesesg.Content.ToString();*/
+        }
+
+        public string addTicketPC( string idpc, string idTicket)
+        {
+            Console.WriteLine(string.Concat("addTicketPC()"));
+            loginGlpiSA();
+            string result = string.Empty;
+            string fileaddres = string.Empty;
+            string _UriT = string.Empty;
+            var idjson = "";
+            //создание заявки
+            try
+            {
+                /*
+                string _UriT0 = this.GLPIurl;
+                string _UriT = string.Empty;
+                if (itemPath == "" || itemPath == null || itemPath == string.Empty) _UriT = "/" + Path +"/" + idTicket + "/";
+                
+                if(itemPath!="" || itemPath!=null || itemPath!=string.Empty) _UriT += _UriT = "/" + Path + "/" + idTicket + "/" + itemPath + "/";
+                
+              //  string JsonStringCreate = "{\"input\": [{\"id\" : \"" + idTicket + "\",\"" + fieldedit+"\" : \"" + value + "\"}]}";
+                string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"" + fieldedit + "\" : \"" + value + "\",\"type\": \"3\"}]}";
+                */
+
+                _UriT = this.GLPIurl + "/" + "Computer" + "/" + idpc + "/" + "item_ticket";
+                //  string JsonStringCreate = "{\"input\": [{\"tickets_id\" : \"" + idTicket + "\",\"\": \"" + value + "\",\"type\": \"2\",\"use_notification\": \"1\"}]}";
+                // string JsonStringCreate = "{ \"input\": [{ \"id\" : \""+ idTicket + "\" , \"\"" + fieldedit + "\" : \"" + value + "\"\" } ] }";
+                //
+                // string JsonStringCreate = "{ \"input\": {\""+ idname + "\" : \"" + idTicket + "\",\"name\" : \"" + "test" + "\",\"knowbaseitems_id\":\"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\",\"users_id\":2,\"type\": \"3\" }}";               
+            
+                //  string JsonStringCreate = "{ \"input\": {\"" + idname + "\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\" }}";
+                // string JsonStringCreate = "{\"input\": [{\"itemtype\":\"Computer\",\"items_id"\:\""+idpc+"\",\"tickets_id\":\""+ idTicket+"\","links":[{"rel":"Computer","href":"http://192.168.16.12:81/apirest.php/Computer/6"},{"rel":"Ticket","href":"http://192.168.16.12:81/apirest.php/Ticket/275"}]}]}"
+                string JsonStringCreate = "{\"input\": [{\"itemtype\":\"Computer\",\"items_id\":\"" + idpc + "\",\"tickets_id\":\"" + idTicket + "\"}]}";
+
+                // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\" }]}";
+                // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\",\"use_notification\": \"1\"}]}";
+
+                //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
+                // ,\"users_id_recipient\":\"2\"
+                var clientses = new RestClient(_UriT);
+                clientses.AddDefaultHeader("Content-Type", "application/json");
+                clientses.AddDefaultHeader("Session-Token", this.SaSession);
+                clientses.AddDefaultHeader("App-Token", this.AppTocken);
+
+
+                IRestRequest request;
+                //  IRestRequest request = new RestRequest("", Method.PUT, DataFormat.Json);
+               /* if (addorupdate)
+                {*/
+                    request = new RestRequest("", Method.POST, DataFormat.Json);
+               /* }
+                else
+                {
+                    request = new RestRequest("", Method.PUT, DataFormat.Json);
+                }
+                */
+                request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
+
+                request.AddJsonBody(JsonStringCreate);
+                Console.WriteLine("AddJsonBody:");
+                Console.WriteLine(request.Resource);
+
+                var response = clientses.Execute(request);
+                Console.WriteLine("updateItemId:");
+                Console.WriteLine(response.Content);
+
+                string resultJson = response.Content.ToString();
+
+
+                // var details = Json.JsonParser.FromJson(label4.Text);
+               // idjson = parseJSON(resultJson);
+                idjson = parseJSONArray(resultJson);
+
+                //  var idjson = parseJSON(label4.Text);
+                //   label5.Text= idjson;
+                //  label6.Text = idjson.ToString();
+                result = "{\"addTicketPC_Update\": \"" + idjson + "\"}" + _UriT + "  JSON{ " + JsonStringCreate + "} ";
+
+            }
+            catch (Exception er)
+            {
+                result = "{\"addTicketPC_Error\": \"" + er.Message.ToString() + "\"} " + "   " + _UriT;
+                //   MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
+                // label6.Text = result;
+            }
+            finally {
+                Console.WriteLine(string.Concat("Computer add ticket: ",  " Name: " + Environment.MachineName+" ticket add result: "+ result));
+                closeSessionSA(); }
             return result;
 
             /* richTextBox1.Text = responsesesg.Content.ToString();
@@ -700,6 +927,8 @@ namespace GlPiLibNet
 
         public string createknowbaseitem(string theme, string user, string pass, string iduser, int viewid, bool resultint_Json)
         {
+            Console.WriteLine(string.Concat("createknowbaseitem()"));
+            loginGlpiSA();
             string result = string.Empty;
             string fileaddres = string.Empty;
             var idjson = "";
@@ -713,7 +942,7 @@ namespace GlPiLibNet
                 //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
                 // ,\"users_id_recipient\":\"2\"
 
-                clientses = new RestClient(_UriT);
+                var clientses = new RestClient(_UriT);
                 
                 clientses.AddDefaultHeader("Content-Type", "application/json");
                 clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
@@ -725,27 +954,29 @@ namespace GlPiLibNet
                 request.AddJsonBody(JsonStringCreate);
 
                 var response = clientses.Execute(request);
-                Console.WriteLine("CreateTicket:");
+                Console.WriteLine("KnowbaseItem:");
                 Console.WriteLine(response.Content);
 
                 string resultJsonstr = response.Content.ToString();
 
                 // var details = Json.JsonParser.FromJson(label4.Text);
+                Console.WriteLine(string.Concat("createknowbaseitem_parse: ", resultJsonstr));
                 idjson = parseJSONArray(resultJsonstr);
                 //   var idjson = parseJSON(label4.Text);
                 //   label5.Text= idjson;
                 // label6.Text = idjson.ToString();
                 if (resultint_Json)
-                    result = "{\"ticket_add\": \"" + idjson.ToString() + "\"}";
+                    result = "{\"KnowbaseItem_add\": \"" + idjson.ToString() + "\"}";
                 else result = idjson;
             }
             catch (Exception er)
             {
                 //  MessageBox.Show(er.Message.ToString(), "Ошибка заявки ");
                 if (resultint_Json)
-                    result = "{\"ticket_error\": \"" + er.Message.ToString() + "\"}";
-                else result = "ticket_error: " + er.Message.ToString();
+                    result = "{\"KnowbaseItem_error\": \"" + er.Message.ToString() + "\"}";
+                else result = "KnowbaseItem_error: " + er.Message.ToString();
             }
+            finally { closeSessionSA(); }
 
             return result;
         }
