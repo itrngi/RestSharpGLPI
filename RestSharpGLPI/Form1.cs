@@ -48,28 +48,51 @@ namespace RestSharpGLPI
             myGlpiLib.UserPass = pass;
             myGlpiLib.AuthType = auth;
 
-           /* if (myGlpiLib.SessionAdmin == string.Empty)
-            {
-
-                myGlpiLib.loginGlpi();
-            }
-            else { 
-                myGlpiLib.closeSession(); 
+            /*
+            myGlpiLib.SaUserName = "normal";
+            myGlpiLib.SaUserPass = "normal";
+            */
+            /*
+            myGlpiLib.SaUserName = "tech";
+            myGlpiLib.SaUserPass = "tech";
+            */
             
-            }*/
+            myGlpiLib.SaUserName = "glpi";
+            myGlpiLib.SaUserPass = "glpi";
+            
+            myGlpiLib.SaAuthType = "local";
+
+
+            /* if (myGlpiLib.SessionAdmin == string.Empty)
+             {
+
+                 myGlpiLib.loginGlpi();
+             }
+             else { 
+                 myGlpiLib.closeSession(); 
+
+             }*/
 
             if (myGlpiLib.SessionAdmin != string.Empty)
             {
                 myGlpiLib.closeSession();
                 button1.Text = "LogOut";
-               // getListUsers();
+              //  getListUsers();
             }
             else {
                 myGlpiLib.loginGlpi();
+              
 
-                button1.Text = "LogIn"; }
+                getListUsers();
+                button1.Text = "LogIn";
+                string users_idNumber = myGlpiLib.searchTicketId("name", myGlpiLib.SaUserName, "User");
+                textBox12.Text = users_idNumber;
+                Console.WriteLine(string.Concat("users_idNumber: ", users_idNumber));
+            }
         }
 
+
+        
         /*
         public void adminlogin()
         {
@@ -162,12 +185,13 @@ namespace RestSharpGLPI
             try
             {
                
-                idKnowbaseItem = myGlpiLib.searchTicketId("name", textBox3.Text, "idKnowbaseItem"); //поиск имеющейся записи в базе знаний
+                idKnowbaseItem = myGlpiLib.searchTicketId("name", textBox3.Text, "KnowbaseItem"); //поиск имеющейся записи в базе знаний
                 Console.WriteLine(string.Concat("idKnowbaseItem: ", idKnowbaseItem));
             }
             catch (Exception er) { idKnowbaseItem = string.Empty;
                 Console.WriteLine(string.Concat("idKnowbaseItemError: ", er.Message.ToString())); ;
             }
+
             string idKnowbaseItemNew = string.Empty;
             if (idKnowbaseItem == string.Empty)
                 //если записи в базе знаний нет, создаём новую
@@ -186,7 +210,8 @@ namespace RestSharpGLPI
                 string users_idNumber = myGlpiLib.searchTicketId("name", myGlpiLib.SaUserName, "User");
                 Console.WriteLine(string.Concat("users_idNumber: ", users_idNumber));
                 //string idNewticket3 = myGlpiLib.updateItemId("PathName", "PathName_id", PathName_idNumber, "PathName_User", "users_id", users_idNumber, true);
-                idKnowbaseItemUser = myGlpiLib.updateItemId("knowbaseitem", "knowbaseitems_id", idKnowbaseItemNew, "knowbaseitem_User", "users_id", users_idNumber, false);
+                //idKnowbaseItemUser = myGlpiLib.updateItemId("knowbaseitem", "knowbaseitems_id", idKnowbaseItemNew, "knowbaseitem_User", "users_id", users_idNumber, false);
+                idKnowbaseItemUser = myGlpiLib.addUserNaznachknowbase(idKnowbaseItemNew, users_idNumber);
                 Console.WriteLine(string.Concat("idKnowbaseItemUser: ", idKnowbaseItemUser));
                 
               //  string profile_idNumber = myGlpiLib.searchTicketId("name", "admin", "profile");
@@ -841,7 +866,8 @@ namespace RestSharpGLPI
 
         private void button9_Click(object sender, EventArgs e)
         {
-             string idNewticket3 = myGlpiLib.addUserNaznachItemId(textBox11.Text, textBox6.Text, textBox12.Text);
+            // string idNewticket3 = myGlpiLib.addUserNaznachItemId(textBox11.Text, textBox6.Text, textBox12.Text);
+            string idNewticket3 = myGlpiLib.addUserNaznachknowbase(textBox6.Text, textBox12.Text);
              richTextBox1.Text = idNewticket3;
 
           /*  string idNewticket3 = myGlpiLib.updateItemId(textBox11.Text, textBox15.Text, textBox6.Text, textBox7.Text, textBox8.Text, textBox12.Text, true);
@@ -855,7 +881,7 @@ namespace RestSharpGLPI
             {
 
                 button1.Text = "LogOut";
-              //  getListUsers();
+               // getListUsers();
             }
             else { button1.Text = "LogIn"; }
         }
@@ -951,6 +977,8 @@ namespace RestSharpGLPI
 
         private void button11_Click(object sender, EventArgs e)
         {
+            string users_idNumber = myGlpiLib.searchTicketId("name", myGlpiLib.SaUserName, "User");
+            Console.WriteLine(string.Concat("users_idNumber: ", users_idNumber));
             string idNewticket3 = myGlpiLib.updateItemId(textBox11.Text, textBox15.Text, textBox6.Text, textBox7.Text, textBox8.Text, textBox12.Text, false);
             richTextBox1.Text = idNewticket3;
         }

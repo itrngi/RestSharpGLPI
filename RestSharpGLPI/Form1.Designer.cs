@@ -280,6 +280,7 @@
             this.textBox5.Name = "textBox5";
             this.textBox5.Size = new System.Drawing.Size(75, 20);
             this.textBox5.TabIndex = 21;
+            this.textBox5.Text = "knowbaseitem";
             // 
             // button7
             // 
@@ -297,6 +298,7 @@
             this.textBox6.Name = "textBox6";
             this.textBox6.Size = new System.Drawing.Size(100, 20);
             this.textBox6.TabIndex = 23;
+            this.textBox6.Text = "61";
             // 
             // textBox7
             // 
@@ -365,6 +367,7 @@
             this.textBox9.Name = "textBox9";
             this.textBox9.Size = new System.Drawing.Size(75, 20);
             this.textBox9.TabIndex = 31;
+            this.textBox9.Text = "knowbaseitem_User";
             // 
             // numericUpDown1
             // 
@@ -427,6 +430,7 @@
             this.textBox12.Name = "textBox12";
             this.textBox12.Size = new System.Drawing.Size(100, 20);
             this.textBox12.TabIndex = 37;
+            this.textBox12.Text = "2";
             // 
             // label16
             // 
@@ -452,6 +456,7 @@
             this.textBox14.Name = "textBox14";
             this.textBox14.Size = new System.Drawing.Size(75, 20);
             this.textBox14.TabIndex = 41;
+            this.textBox14.Text = "knowbaseitem";
             // 
             // backgroundWorker1
             // 
