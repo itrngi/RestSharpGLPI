@@ -50,6 +50,8 @@ namespace GlPiLibNet
 
 
         public string SessionConnectResult { get; set; }
+        public string SessionConnectResultforButton { get; set; }
+
 
 
         /*
@@ -70,6 +72,8 @@ namespace GlPiLibNet
             this.GLPIurl = glpiUrl;
             this.SessionAdmin = string.Empty;
             this.SaSession = string.Empty;
+            this.SessionConnectResult = "Отключен";
+            this.SessionConnectResultforButton = "Войти";
         }
 
 
@@ -128,17 +132,21 @@ namespace GlPiLibNet
             return result;
         }
 
-        // public string loginGlpi(string user, string pass, string authType/*, string appTocken*/)
+        public void authGlpi(string user, string pass, string authType/*, string appTocken*/) {
+            this.UserName = user;
+            this.UserPass = pass;
+            this.AuthType = authType;
+        }
         public string loginGlpi()
 
         {
-            loginGlpiSA();
+          //  loginGlpiSA();
             Console.WriteLine(string.Concat("loginGlpi()"));
             string result = string.Empty;
-          /*  this.UserName = user;
+           /* this.UserName = user;
             this.UserPass = pass;
-            this.AuthType = authType;
-            */
+            this.AuthType = authType;*/
+            
             try
             {
                 if (this.UserName != string.Empty && this.UserPass != string.Empty)
@@ -159,7 +167,7 @@ namespace GlPiLibNet
                     this.SessionAdmin = details["session_token"].ToString();
                     Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
                     // textBox1.Text = sessionAdmin;// response.Content.ToString();
-                    sessionConnect(this.SessionAdmin);
+                  //  sessionConnect(this.SessionAdmin);
 
                     // adminlogin();
                     // getListUsers();
@@ -181,14 +189,18 @@ namespace GlPiLibNet
                 this.SessionAdmin = string.Empty;
                 result = "{\"loginGlpi_error\": \"" + er.Message.ToString() + "\"}";
             }
-            finally { if (this.SessionAdmin != string.Empty) this.SessionConnectResult = "Подключен"; else this.SessionConnectResult = "Отключен"; }
+            finally {
+                if (this.SessionAdmin != string.Empty) this.SessionConnectResult = "Подключен"; else this.SessionConnectResult = "Отключен";
+                if (this.SessionAdmin != string.Empty) this.SessionConnectResultforButton = "Выйти"; else this.SessionConnectResultforButton = "Войти";
+                
+            }
             return result;
         }
 
        // public void closeSession(string getsession)
              public void closeSession()
         {
-            closeSessionSA();
+           // closeSessionSA();
             Console.WriteLine(string.Concat("closeSession()"));
             string _UriT = this.GLPIurl + "/killSession/";
             var clientses = new RestClient(_UriT);
@@ -198,6 +210,8 @@ namespace GlPiLibNet
             var requestses = new RestRequest("resource", Method.GET);
             IRestResponse responseses = clientses.Execute(requestses);
             this.SessionAdmin = string.Empty;
+            if (this.SessionAdmin != string.Empty) this.SessionConnectResult = "Подключен"; else this.SessionConnectResult = "Отключен";
+            if (this.SessionAdmin != string.Empty) this.SessionConnectResultforButton = "Выйти"; else this.SessionConnectResultforButton = "Войти";
         }
 
         public void closeSessionSA()
@@ -268,7 +282,7 @@ namespace GlPiLibNet
         public string getTicketId(string idDOc)
         {
             Console.WriteLine(string.Concat("getTicketId()"));
-            // loginGlpiSA();
+             loginGlpiSA();
             string _UriT = this.GLPIurl;// + idDOc;
 
             var clientses = new RestClient(_UriT);
@@ -290,14 +304,14 @@ namespace GlPiLibNet
 
 
             string resultJson = responsesesg.Content.ToString();
-
+            closeSessionSA();
             //label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
             return resultJson;
-           // closeSessionSA();
+           // 
         }
         public string getJsonString(string pathurl, int idItem, string itemPath)
         {
-            // loginGlpiSA();
+             loginGlpiSA();
             Console.WriteLine(string.Concat("getJsonString()"));
             // loginGlpi();
             string _UriT = this.GLPIurl;// + idDOc;
@@ -327,7 +341,7 @@ namespace GlPiLibNet
 
             //label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
             // closeSession();
-           // closeSessionSA();
+            closeSessionSA();
             return resultJson;
             /* var details = Json.JsonParser.FromJson(textBox1.Text);
              session = details["session_token"].ToString();
@@ -379,7 +393,7 @@ namespace GlPiLibNet
         public List<ClassUsers> getListUsers()
         {
             Console.WriteLine(string.Concat("getListUsers()"));
-           // loginGlpiSA();
+            loginGlpiSA();
             List<ClassUsers> usersGlpi = new List<ClassUsers>();
             string _UriT = this.GLPIurl;// + idDOc;
             var clientses = new RestClient(_UriT);
@@ -403,11 +417,11 @@ namespace GlPiLibNet
             */
 
             usersGlpi= parseJSONUserArray(responsesesg.Content.ToString());
-          // closeSessionSA();
+           closeSessionSA();
               return usersGlpi;
         }
     
-
+        
        
 
         public string parseJSON(string jsonSTR)
@@ -505,7 +519,7 @@ namespace GlPiLibNet
                 //  MessageBox.Show(er.Message.ToString(), "Ошибка заявки ");
                 if (resultint_Json)
                     result = "{\"ticket_error\": \"" + er.Message.ToString() + "\"}";
-                else result = "ticket_error: " + er.Message.ToString();
+                else result = "-1";// "ticket_error: " + er.Message.ToString();
             }
             finally { closeSession(); }
 
@@ -586,7 +600,7 @@ namespace GlPiLibNet
             //создание заявки
             try
              {
-            loginGlpi();
+            loginGlpiSA();
                 string _UriT = this.GLPIurl + "/Ticket/" + idTicket + "/Ticket_User/";
                 string JsonStringCreate = "{\"input\": {\"tickets_id\" : \"" + idTicket + "\",\"users_id\": \"" + userid + "\",\"type\": \"" + type + "\",\"use_notification\": \"1\"}}";
                 //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
@@ -630,7 +644,7 @@ namespace GlPiLibNet
               }
               finally 
             {
-                // closeSessionSA(); 
+                 closeSessionSA(); 
             }
             return result;
 
@@ -646,7 +660,7 @@ namespace GlPiLibNet
     {
             Console.WriteLine(string.Concat("searchTicketId()"));
 
-            // loginGlpiSA();
+             loginGlpiSA();
             // string _UriT = this.GLPIurl;// + idDOc;
             string _UriT = this.GLPIurl;// + "/search/" + pathsearch + "?is_deleted=0&criteria[0]["+ field+"]=" + name;// +"/ " + idTicket + "/Ticket_User/";
 
@@ -689,8 +703,7 @@ namespace GlPiLibNet
              string idsearch = details["id"].ToString();*/
             Console.WriteLine(string.Concat("idsearch: ", idsearch));
 
-
-            // closeSessionSA(); 
+            closeSessionSA(); 
 
             return idsearch;
         }
@@ -699,7 +712,7 @@ namespace GlPiLibNet
         public string addUserNaznachknowbase(string idTicket, string userId)
         {
             Console.WriteLine(string.Concat("addUserNaznachItemId()"));
-          //  // loginGlpiSA();
+           loginGlpiSA();
             string result = string.Empty;
             string fileaddres = string.Empty;
             string _UriT = string.Empty;
@@ -757,7 +770,7 @@ namespace GlPiLibNet
              
             }
             finally {
-               // closeSessionSA(); 
+                closeSessionSA(); 
             }
             return result;
 
@@ -767,7 +780,7 @@ namespace GlPiLibNet
         public string addUserNaznachItemId(string Path, string idTicket, string userId)
         {
             Console.WriteLine(string.Concat("addUserNaznachItemId()"));
-            // loginGlpiSA();
+             loginGlpiSA();
             string result = string.Empty;
             string fileaddres = string.Empty;
             string _UriT = string.Empty;
@@ -844,7 +857,7 @@ namespace GlPiLibNet
                 // label6.Text = result;
             }
             finally {
-                // closeSessionSA(); 
+                 closeSessionSA(); 
             }
             return result;
 
@@ -857,7 +870,7 @@ namespace GlPiLibNet
         public string updateItemId(string Path, string idname, string idTicket, string itemPath, string fieldedit, string value,bool addorupdate)
         {
             Console.WriteLine(string.Concat("updateItemId()"));
-            // loginGlpiSA();
+             loginGlpiSA();
             string result = string.Empty;
             string fileaddres = string.Empty;
             string _UriT = string.Empty;
@@ -948,11 +961,11 @@ namespace GlPiLibNet
                 var details = Json.JsonParser.FromJson(resultJson);
               
              //   idjson = parseJSON(resultJson);
-              //  idjson = parseJSONArray(resultJson);
-             
+                idjson = parseJSONArray(resultJson);
+
                 //   label5.Text= idjson;
                 //  label6.Text = idjson.ToString();
-                result = "{\"updateItemId_Update\": \"" +  "\"}" + _UriT + "  JSON{ " + JsonStringCreate + "} " + addorupdate.ToString();
+                result = idjson;// "{\"updateItemId_Update\": \"" +  "\"}" + _UriT + "  JSON{ " + JsonStringCreate + "} " + addorupdate.ToString();
 
             }
             catch (Exception er)
@@ -962,7 +975,7 @@ namespace GlPiLibNet
                 // label6.Text = result;
             }
             finally {
-                // closeSessionSA(); 
+                 closeSessionSA(); 
             }
             return result;
 
@@ -975,7 +988,7 @@ namespace GlPiLibNet
         public string addTicketPC( string idpc, string idTicket)
         {
             Console.WriteLine(string.Concat("addTicketPC()"));
-            // loginGlpiSA();
+             loginGlpiSA();
             string result = string.Empty;
             string fileaddres = string.Empty;
             string _UriT = string.Empty;
@@ -1058,7 +1071,7 @@ namespace GlPiLibNet
             }
             finally {
                 Console.WriteLine(string.Concat("Computer add ticket: ",  " Name: " + Environment.MachineName+" ticket add result: "+ result));
-               // closeSessionSA(); 
+                closeSessionSA(); 
             }
             return result;
 
@@ -1071,7 +1084,7 @@ namespace GlPiLibNet
         public string createknowbaseitem(string theme, string user, string pass, string iduser, int viewid, bool resultint_Json)
         {
             Console.WriteLine(string.Concat("createknowbaseitem()"));
-            // loginGlpiSA();
+             loginGlpiSA();
             string result = string.Empty;
             string fileaddres = string.Empty;
             var idjson = "";
@@ -1123,7 +1136,7 @@ namespace GlPiLibNet
                 else result = "KnowbaseItem_error: " + er.Message.ToString();
             }
             finally {
-                // closeSessionSA();
+                 closeSessionSA();
             }
 
             return result;

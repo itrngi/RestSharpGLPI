@@ -18,6 +18,8 @@ using System.Drawing.Imaging;
 using GlPiLibNet;
 using System.Security.Principal;
 using System.DirectoryServices;
+using INISettings;
+using CoderGLPI;
 
 namespace RestSharpGLPI
 {
@@ -33,6 +35,8 @@ namespace RestSharpGLPI
         public RestClient clientses ;
 
         public GlPiLibNet.GlPiLibNet myGlpiLib = new GlPiLibNet.GlPiLibNet(Properties.Settings.Default.GLPI_APP_TOKEN0, Properties.Settings.Default.GLPI_URL0);
+        IniFile settingFile = new IniFile("Settings.ini");
+        CoderDecoder coderDecoder = new CoderDecoder();
         public Form1()
         {
             InitializeComponent();
@@ -43,26 +47,42 @@ namespace RestSharpGLPI
             string user = textBox3.Text;
             string pass = textBox4.Text;
             string auth = textBox13.Text;
-           
-            myGlpiLib.UserName = user;
-            myGlpiLib.UserPass = pass;
-            myGlpiLib.AuthType = auth;
 
-            /*
-            myGlpiLib.SaUserName = "normal";
-            myGlpiLib.SaUserPass = "normal";
-            */
-            /*
-            myGlpiLib.SaUserName = "tech";
-            myGlpiLib.SaUserPass = "tech";
-            */
+
             
-            myGlpiLib.SaUserName = "glpi";
-            myGlpiLib.SaUserPass = "glpi";
+            string userini= settingFile.ReadINI("Auth", "User");
+            string passini = settingFile.ReadINI("Auth", "Pass");
+            string authini = settingFile.ReadINI("Auth", "Type");
+
+            string decodeuser = coderDecoder.DeShifrovka(userini, "SeGlPi@RnGiLoCaL");
+            string decodepass= coderDecoder.DeShifrovka(passini, "SeGlPi@RnGiLoCaL");
+            string decodeauth = coderDecoder.DeShifrovka(authini, "SeGlPi@RnGiLoCaL");
             
-            myGlpiLib.SaAuthType = "local";
+
+            string useraini = settingFile.ReadINI("AuthA", "User");
+            string passaini = settingFile.ReadINI("AuthA", "Pass");
+            string authaini = settingFile.ReadINI("AuthA", "Type");
+
+            string decodeusera = coderDecoder.DeShifrovka(useraini, "SeGlPi@RnGiLoCaL");
+            string decodepassa = coderDecoder.DeShifrovka(passaini, "SeGlPi@RnGiLoCaL");
+            string decodeautha = coderDecoder.DeShifrovka(authaini, "SeGlPi@RnGiLoCaL");
+
+            
+
+            /* string decodepass = coderDecoder.DeShifrovka(codepass, "SeGlPi@RnGiLoCaL");
+              this.Text = "Pass: " + pass + " code: " + codepass + " decode: " + decodepass;
+              */
 
 
+
+            myGlpiLib.UserName =  user;
+            myGlpiLib.UserPass =  pass;
+            myGlpiLib.AuthType =  auth;
+            
+            myGlpiLib.SaUserName = decodeusera;
+            myGlpiLib.SaUserPass = decodepassa;
+            myGlpiLib.SaAuthType = decodeautha;
+            
             /* if (myGlpiLib.SessionAdmin == string.Empty)
              {
 
@@ -89,6 +109,26 @@ namespace RestSharpGLPI
                 textBox12.Text = users_idNumber;
                 Console.WriteLine(string.Concat("users_idNumber: ", users_idNumber));
             }
+
+            string codeuser = coderDecoder.Shifrovka(user, "SeGlPi@RnGiLoCaL");
+            string codepass = coderDecoder.Shifrovka(pass, "SeGlPi@RnGiLoCaL");
+            string codeauth = coderDecoder.Shifrovka(auth, "SeGlPi@RnGiLoCaL");
+            /* string decodepass = coderDecoder.DeShifrovka(codepass, "SeGlPi@RnGiLoCaL");
+              this.Text = "Pass: " + pass + " code: " + codepass + " decode: " + decodepass;
+              */
+            settingFile.Write("Auth", "User", codeuser);
+            settingFile.Write("Auth", "Pass", codepass);
+            settingFile.Write("Auth", "Type", codeauth);
+
+            string codeusera = coderDecoder.Shifrovka("glpi", "SeGlPi@RnGiLoCaL");
+            string codepassa = coderDecoder.Shifrovka("glpi", "SeGlPi@RnGiLoCaL");
+            string codeautha = coderDecoder.Shifrovka("local", "SeGlPi@RnGiLoCaL");
+            /* string decodepass = coderDecoder.DeShifrovka(codepass, "SeGlPi@RnGiLoCaL");
+              this.Text = "Pass: " + pass + " code: " + codepass + " decode: " + decodepass;
+              */
+            settingFile.Write("AuthA", "User", codeusera);
+            settingFile.Write("AuthA", "Pass", codepassa);
+            settingFile.Write("AuthA", "Type", codeautha);
         }
 
 
@@ -168,59 +208,7 @@ namespace RestSharpGLPI
             if (pathfile != string.Empty)
               label5.Text=  myGlpiLib.addFileToTicket(idNewticket, pathfile, namefile);            
            
-            label6.Text =  myGlpiLib.updateTicketId(idNewticket,"101","2");
-            // createTicket(textBox2.Text, richTextBox2.Text, "", sessionAdmin);
-            // closeSession(sessionAdmin);
-
-
-           
-
-            //  textBox1.Text = myGlpiLib.loginGlpi();
-            //  if (myGlpiLib.SessionAdmin != string.Empty) getListUsers();
-           
-            
-            string idcategory = myGlpiLib.searchTicketId("name", "UsersLogin", "KnowbaseItemCategory");
-            Console.WriteLine(string.Concat("idcategory: ", idcategory));
-            string idKnowbaseItem = string.Empty;
-            try
-            {
-               
-                idKnowbaseItem = myGlpiLib.searchTicketId("name", textBox3.Text, "KnowbaseItem"); //поиск имеющейся записи в базе знаний
-                Console.WriteLine(string.Concat("idKnowbaseItem: ", idKnowbaseItem));
-            }
-            catch (Exception er) { idKnowbaseItem = string.Empty;
-                Console.WriteLine(string.Concat("idKnowbaseItemError: ", er.Message.ToString())); ;
-            }
-
-            string idKnowbaseItemNew = string.Empty;
-            if (idKnowbaseItem == string.Empty)
-                //если записи в базе знаний нет, создаём новую
-                idKnowbaseItemNew = myGlpiLib.createknowbaseitem(idcategory, textBox3.Text, textBox4.Text, idKnowbaseItem, 5, true); 
-            else idKnowbaseItemNew = string.Empty;//если запись в базе знаний есть, не создаём новую
-            Console.WriteLine(string.Concat("idKnowbaseItem: ", idKnowbaseItem));
-
-
-            string idKnowbaseItemUser = string.Empty;
-            if (idKnowbaseItemNew != string.Empty)//если запись в базе знаний создана новая, назначаем ей пользователя
-            {
-
-                //string users_idNumber = myGlpiLib.searchTicketId("name", "user", "Path");
-                Console.WriteLine(string.Concat("idKnowbaseItemNew != string.Empty: ", idKnowbaseItemNew));
-
-                string users_idNumber = myGlpiLib.searchTicketId("name", myGlpiLib.SaUserName, "User");
-                Console.WriteLine(string.Concat("users_idNumber: ", users_idNumber));
-                //string idNewticket3 = myGlpiLib.updateItemId("PathName", "PathName_id", PathName_idNumber, "PathName_User", "users_id", users_idNumber, true);
-                //idKnowbaseItemUser = myGlpiLib.updateItemId("knowbaseitem", "knowbaseitems_id", idKnowbaseItemNew, "knowbaseitem_User", "users_id", users_idNumber, false);
-                idKnowbaseItemUser = myGlpiLib.addUserNaznachknowbase(idKnowbaseItemNew, users_idNumber);
-                Console.WriteLine(string.Concat("idKnowbaseItemUser: ", idKnowbaseItemUser));
-                
-              //  string profile_idNumber = myGlpiLib.searchTicketId("name", "admin", "profile");
-              //  profile_idNumber = myGlpiLib.updateItemId("knowbaseitem", "knowbaseitems_id", idKnowbaseItemNew, "knowbaseitem_profile", "profiles_id", profile_idNumber, true);
-                
-
-            }
-            else idKnowbaseItemUser = string.Empty;
-            Console.WriteLine(string.Concat("idKnowbaseItem: ", idKnowbaseItem));
+            label6.Text =  myGlpiLib.updateTicketId(idNewticket,"101","2");                     
 
             try
             {
@@ -233,10 +221,12 @@ namespace RestSharpGLPI
                     Console.WriteLine(string.Concat("Computer: ", " Name: " + Environment.MachineName + " не найден в GLPI"));
             }catch(Exception er) { Console.WriteLine(string.Concat("Computer: ", " Name: " + Environment.MachineName + " Error: "+er.Message.ToString())); }
 
-            
+            addUserLogin(textBox3.Text, textBox4.Text);
+
+
             // string idNewticket3 = myGlpiLib.updateItemId("KnowbaseItem", idNewticket2, "KnowbaseItemCategory", idcategory);
-           richTextBox1.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItem + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
-            label4.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItem + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
+            // richTextBox1.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItem + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
+            // label4.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItem + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
 
 
 
@@ -813,8 +803,40 @@ namespace RestSharpGLPI
         {
             DisplayUser(WindowsIdentity.GetCurrent());
 
-           
 
+        
+
+
+
+            string userini = settingFile.ReadINI("Auth", "User");
+            string passini = settingFile.ReadINI("Auth", "Pass");
+            string authini = settingFile.ReadINI("Auth", "Type");
+            
+            string decodeuser = coderDecoder.DeShifrovka(userini, "SeGlPi@RnGiLoCaL");
+            string decodepass = coderDecoder.DeShifrovka(passini, "SeGlPi@RnGiLoCaL");
+            string decodeauth = coderDecoder.DeShifrovka(authini, "SeGlPi@RnGiLoCaL");
+
+            textBox3.Text = decodeuser;
+            textBox4.Text = decodepass;
+            textBox13.Text = decodeauth;
+            /*
+            textBox3.Text = userini;
+            textBox4.Text = passini;
+            textBox13.Text = authini;
+            */
+            
+          string useraini = settingFile.ReadINI("AuthA", "User");
+          string passaini = settingFile.ReadINI("AuthA", "Pass");
+          string authaini = settingFile.ReadINI("AuthA", "Type");
+
+          string decodeusera = coderDecoder.DeShifrovka(useraini, "SeGlPi@RnGiLoCaL");
+          string decodepassa = coderDecoder.DeShifrovka(passaini, "SeGlPi@RnGiLoCaL");
+          string decodeautha = coderDecoder.DeShifrovka(authaini, "SeGlPi@RnGiLoCaL");
+
+
+            myGlpiLib.SaUserName = decodeusera;
+            myGlpiLib.SaUserPass = decodepassa;
+            myGlpiLib.SaAuthType = decodeautha;
             //   button1.PerformClick();
         }
 
@@ -909,13 +931,21 @@ namespace RestSharpGLPI
             myGlpiLib.AuthType = auth;
         }
 
+
+
         private void button10_Click(object sender, EventArgs e)
+        {
+            addUserLogin(textBox3.Text, textBox4.Text);
+        }
+
+        private void addUserLogin(string user,string pass)
         {
             string idcategory = string.Empty;
             try
             {
                 idcategory = myGlpiLib.searchTicketId("name", "UsersLogin", "KnowbaseItemCategory");//1
                 Console.WriteLine(string.Concat("idcategory: ", idcategory));
+                int idItem = Convert.ToInt32(idcategory);
 
             }
             catch (Exception er)
@@ -928,8 +958,12 @@ namespace RestSharpGLPI
             try
             {
 
-                idKnowbaseItemBD = myGlpiLib.searchTicketId("name", textBox3.Text, "idKnowbaseItem"); //поиск имеющейся записи в базе знаний
+                idKnowbaseItemBD = myGlpiLib.searchTicketId("name", user, "KnowbaseItem"); //поиск имеющейся записи в базе знаний
                 Console.WriteLine(string.Concat("idKnowbaseItemBD: ", idKnowbaseItemBD));
+               
+                int idItem = Convert.ToInt32(idKnowbaseItemBD);
+                Console.WriteLine(string.Concat("idKnowbaseItemBD idItem: ", idItem));
+
             }
             catch (Exception er)
             {
@@ -940,7 +974,7 @@ namespace RestSharpGLPI
             string idKnowbaseItemNew = string.Empty;
             if (idKnowbaseItemBD == string.Empty)
                 //если записи в базе знаний нет, создаём новую
-                idKnowbaseItemNew = myGlpiLib.createknowbaseitem(idcategory, textBox3.Text, textBox4.Text, idKnowbaseItemBD, 5, true);
+                idKnowbaseItemNew = myGlpiLib.createknowbaseitem(idcategory, user, pass, idKnowbaseItemBD, 5, false);
             else idKnowbaseItemNew = string.Empty;//если запись в базе знаний есть, не создаём новую
             Console.WriteLine(string.Concat("idKnowbaseItemNew: ", idKnowbaseItemNew));
 
@@ -955,9 +989,9 @@ namespace RestSharpGLPI
                 string users_idNumber = myGlpiLib.searchTicketId("name", myGlpiLib.SaUserName, "User");
                 Console.WriteLine(string.Concat("users_idNumber: ", users_idNumber));
                 //string idNewticket3 = myGlpiLib.updateItemId("PathName", "PathName_id", PathName_idNumber, "PathName_User", "users_id", users_idNumber, true);
-                idKnowbaseItemUser = myGlpiLib.updateItemId("knowbaseitem", "knowbaseitems_id", idKnowbaseItemNew, "knowbaseitem_User", "users_id", users_idNumber, true);
+                idKnowbaseItemUser = myGlpiLib.updateItemId("knowbaseitem", "knowbaseitems_id", idKnowbaseItemNew, "knowbaseitem_User", "users_id", users_idNumber, false);
                 Console.WriteLine(string.Concat("idKnowbaseItemUser: ", idKnowbaseItemUser));
-
+                int idItem = Convert.ToInt32(idKnowbaseItemUser);
                 //  string profile_idNumber = myGlpiLib.searchTicketId("name", "admin", "profile");
                 //  profile_idNumber = myGlpiLib.updateItemId("knowbaseitem", "knowbaseitems_id", idKnowbaseItemNew, "knowbaseitem_profile", "profiles_id", profile_idNumber, true);
 
