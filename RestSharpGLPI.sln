@@ -7,11 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestSharpGLPI", "RestSharpG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLPILibNet", "GLPILibNet\GLPILibNet.csproj", "{FB949347-FF18-4F30-8B54-982AB0279F5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "INISettings", "INISettings\INISettings.csproj", "{6E5B3668-6436-4870-8EED-6599B20A7BD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "INISettings", "INISettings\INISettings.csproj", "{6E5B3668-6436-4870-8EED-6599B20A7BD1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoderGLPI", "CoderGLPI\CoderGLPI.csproj", "{0CD5CB44-A40E-4CAC-A923-7297495A7748}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoderGLPI", "CoderGLPI\CoderGLPI.csproj", "{0CD5CB44-A40E-4CAC-A923-7297495A7748}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientGlpi", "ClientGlpi\ClientGlpi.csproj", "{E2DA525F-3A80-48FE-AB31-CB2258A7F62A}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupGlpi", "SetupGlpi\SetupGlpi.vdproj", "{6DE6F358-E0B5-4D7C-8B8A-533581F5FDF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,8 @@ Global
 		{E2DA525F-3A80-48FE-AB31-CB2258A7F62A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2DA525F-3A80-48FE-AB31-CB2258A7F62A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2DA525F-3A80-48FE-AB31-CB2258A7F62A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DE6F358-E0B5-4D7C-8B8A-533581F5FDF6}.Debug|Any CPU.ActiveCfg = Debug
+		{6DE6F358-E0B5-4D7C-8B8A-533581F5FDF6}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

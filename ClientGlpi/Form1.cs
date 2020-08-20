@@ -23,6 +23,8 @@ namespace ClientGlpi
     public partial class Form1 : Form
     {
         public string pathfile = string.Empty;
+        public string pathfile2 = string.Empty;
+
         public string namefiles1 = string.Empty;
         public string namefiles2 = string.Empty;
         public string namefilesother = string.Empty;
@@ -41,6 +43,8 @@ namespace ClientGlpi
         public Form1()
         {
             InitializeComponent();
+              this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormClosing += Form1_FormClosing;
             this.ShowInTaskbar = false;
             notifyIcon1.Click += notifyIcon1_Click;
         }
@@ -121,7 +125,7 @@ namespace ClientGlpi
         public void DoScreenShot()
         {
             DoScreenShotbmpMain();
-            DoScreenShotbmpPrimary();
+           
         }
 
         private void setFormLocation(Form form, Screen screen)
@@ -140,39 +144,112 @@ namespace ClientGlpi
             //form.Height = size.Height;
         }
 
+       
+        private Bitmap CaptureScreenShot() // делаем скриншот экрана 
+        {
+           // MessageBox.Show(Screen.AllScreens[screenNum].WorkingArea.ToString(), Screen.AllScreens[screenNum].DeviceName+" [ "+ screenNum + "]"+ Screen.AllScreens.Count()+" | "+ Screen.AllScreens[screenNum].Bounds.Location);
+            
+          //  Bitmap bitmap1=new Bitmap(10,10);
+          //  try
+         //   {
+                  Rectangle bounds = Screen.GetBounds(Point.Empty);
+                // if (screenNum >= 0)
+                
+                 // Rectangle bounds = Screen.AllScreens[screenNum].Bounds;
+                // if(screenNum==0)  
+               // Rectangle bounds = Screen.GetBounds(Screen.AllScreens[screenNum].Bounds.Location);
+                // if (screenNum > 0) 
+              //  Rectangle bounds = Screen.GetBounds(new Point(Screen.AllScreens[screenNum].Bounds.X, Screen.AllScreens[screenNum].Bounds.Y));
+            
+                //  bitmap = new Bitmap(Screen.AllScreens[screenNum].Bounds.Width, Screen.AllScreens[screenNum].Bounds.Height);
+
+                int screenLeft =   SystemInformation.VirtualScreen.Left;
+                int screenTop =    SystemInformation.VirtualScreen.Top;
+                int screenWidth =  SystemInformation.VirtualScreen.Width;
+                int screenHeight = SystemInformation.VirtualScreen.Height;
+
+            // Create a bitmap of the appropriate size to receive the screenshot.
+            Bitmap bitmap = new Bitmap(screenWidth, screenHeight);
+            try
+            {
+
+                // Draw the screenshot into our bitmap.
+                using (Graphics g = Graphics.FromImage(bitmap))
+                {
+                    g.CopyFromScreen(screenLeft, screenTop, 0, 0, bitmap.Size);
+
+                }
+
+            }
+            catch (Exception er) { MessageBox.Show(er.Message.ToString(),"CaptureScreenShot"); }
+                // Do something with the Bitmap here, like save it to a file:
+                //  bitmap.Save(savePath, ImageFormat.Jpeg);
+
+
+                //    Bitmap bitmap = new Bitmap(Screen.AllScreens[screenNum].Bounds.Width, Screen.AllScreens[screenNum].Bounds.Height);
+                //   bitmap = new Bitmap(bounds.Width, bounds.Height);
+
+                /* using (Graphics gr = Graphics.FromImage(bitmap1)) 
+                 { gr.CopyFromScreen(Point.Empty, Point.Empty, bounds.Size); }*/
+
+                /*   }catch(Exception er)
+                   {
+                       MessageBox.Show(er.Message.ToString(), "Error Screen Shot");
+                   }*/
+
+            return bitmap;
+        }
+
         public void DoScreenShotbmpMain()
         {
-            Bitmap bmpPrimary = new Bitmap(Screen.AllScreens[1].Bounds.Width, Screen.AllScreens[1].Bounds.Height);
+            //Bitmap bmpPrimary = new Bitmap(10, 10); //new Bitmap(Screen.AllScreens[1].Bounds.Width, Screen.AllScreens[1].Bounds.Height);
+            
+
+            try
+            {
+                int screenWidth = SystemInformation.VirtualScreen.Width;
+                int screenHeight = SystemInformation.VirtualScreen.Height;
+
+                // Create a bitmap of the appropriate size to receive the screenshot.
+                Bitmap bmpPrimary = new Bitmap(screenWidth, screenHeight);
+                 bmpPrimary = CaptureScreenShot();
+                pictureBox2.Image = bmpPrimary;
+            //  MessageBox.Show(this.Controls.Find("pictureBoxScreen", true).ToString());
+            // if () MessageBox.Show("picture");
+            /*  PictureBox pictureScreen = new PictureBox
+              {
+                  Name = "pictureBox1",
+                  Size = new Size(60, 30),
+                  Location = new Point(200, 290),
+                  Image = bmpPrimary,//Image.FromFile("hello.jpg"),
+                  SizeMode= PictureBoxSizeMode.StretchImage,
+
+              };
+              this.Controls.Add(pictureScreen);*/
+            /*
             Graphics g = Graphics.FromImage(bmpPrimary);
-            g.CopyFromScreen(0, 0, Screen.AllScreens[1].Bounds.X, Screen.AllScreens[1].Bounds.Y, Screen.AllScreens[1].Bounds.Size, CopyPixelOperation.SourceCopy);
+            g.CopyFromScreen(0,0, Screen.AllScreens[1].Bounds.X, Screen.AllScreens[1].Bounds.Y, Screen.AllScreens[1].Bounds.Size, CopyPixelOperation.SourceCopy);
+          */
+
+
             namefiles1 = GenerateRandomJpegName("Main_");
-
             string filePath = @"" + fpath + "\\" + namefiles1;
+            pathfile2 = @""+ fpath+"\\" + namefiles1; // filePath;// openFileDialog1.FileName;
+            label7.Text = pathfile2;
+            bmpPrimary.Save(pathfile2, ImageFormat.Jpeg);
+        }catch(Exception er) { MessageBox.Show(er.Message.ToString(),"DoScreenShotbmpMain"); }
+           
 
-            pathfile = fpath + @"\" + namefiles1; // filePath;// openFileDialog1.FileName;
-            label7.Text = pathfile;
-            bmpPrimary.Save(pathfile, ImageFormat.Jpeg);
             // openFile(fpath, namefile);
-        }
-        public void DoScreenShotbmpPrimary()
-        {
-            Bitmap bmpPrimary = new Bitmap(Screen.AllScreens[0].Bounds.Width, Screen.AllScreens[0].Bounds.Height);
-            Graphics g = Graphics.FromImage(bmpPrimary);
-            g.CopyFromScreen(Screen.AllScreens[0].Bounds.Width, 0, Screen.AllScreens[0].Bounds.X, Screen.AllScreens[0].Bounds.Y, Screen.AllScreens[0].Bounds.Size, CopyPixelOperation.SourceCopy);
-            namefiles2 = GenerateRandomJpegName("Primary_");
-
-            string filePath = @"" + fpath + "\\" + namefiles2;
-
-            pathfile = fpath + @"\" + namefiles2; // filePath;// openFileDialog1.FileName;
-            label7.Text = pathfile;
-            bmpPrimary.Save(pathfile, ImageFormat.Jpeg);
-            // openFile(fpath, namefile);
-        }
+        }  
+        
 
         private void button6_Click(object sender, EventArgs e)
         {
             DoScreenShot();
         }
+
+
 
         private void button1_Click(object sender, EventArgs e) 
         { 
@@ -358,11 +435,24 @@ namespace ClientGlpi
         {
 
             string idNewticket = myGlpiLib.createTicket(textBox2.Text, richTextBox2.Text, false);
-          //  label4.Text = idNewticket;
+            //  label4.Text = idNewticket;
+            if (pathfile2 != string.Empty)
+            {
+                
+                // label5.Text =
+                myGlpiLib.addFileToTicket(idNewticket, pathfile2, namefiles1);
+                
+                // myGlpiLib.addFileToTicket(idNewticket, pathfile2, namefiles2);
+            }
+
             if (pathfile != string.Empty)
-               // label5.Text =
-                    myGlpiLib.addFileToTicket(idNewticket, pathfile, namefiles1);
-                    myGlpiLib.addFileToTicket(idNewticket, pathfile, namefiles2);
+            {
+
+                // label5.Text =
+                myGlpiLib.addFileToTicket(idNewticket, pathfile, namefiles1);
+
+                // myGlpiLib.addFileToTicket(idNewticket, pathfile2, namefiles2);
+            }
 
 
             myGlpiLib.updateTicketId(idNewticket, "101", "2");
@@ -398,11 +488,20 @@ namespace ClientGlpi
                 textBox2.Text = string.Empty;
                 richTextBox2.Text = string.Empty;
             }
-        }
+
+            if (pathfile2 != string.Empty)
+            {
+                File.Delete(pathfile2);
+                pictureBox2.Image = null;
+            }
+
+            }
 
         private void button3_Click(object sender, EventArgs e)
         {
             CreateTicket();
+           
+           // pictureBox2.Dispose();
         }
 
         public int screenCount()
@@ -504,6 +603,26 @@ namespace ClientGlpi
             }*/
         }
 
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {            
+            this.Close();
+        }
 
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            this.WindowState = FormWindowState.Minimized;
+
+        }
     }
 }
