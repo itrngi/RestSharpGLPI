@@ -22,6 +22,7 @@ namespace ClientGlpi
 {
     public partial class Form1 : Form
     {
+        public bool closeForm = false;
         public string pathfile = string.Empty;
         public string pathfile2 = string.Empty;
 
@@ -51,7 +52,7 @@ namespace ClientGlpi
 
         void notifyIcon1_Click(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
+          //  this.WindowState = FormWindowState.Normal;
         }
 
         void openFile(string dir, string file)
@@ -276,7 +277,7 @@ namespace ClientGlpi
            // richTextBox2.Text = "user: " + myGlpiLib.UserName + ";Pass:" + myGlpiLib.UserPass + ";Auth:" + myGlpiLib.AuthType + ";";
 
 
-            string useraini = settingFile.ReadINI("AuthA", "User");
+        string useraini = settingFile.ReadINI("AuthA", "User");
         string passaini = settingFile.ReadINI("AuthA", "Pass");
         string authaini = settingFile.ReadINI("AuthA", "Type");
 
@@ -470,7 +471,7 @@ namespace ClientGlpi
             }
             catch (Exception er) { Console.WriteLine(string.Concat("Computer: ", " Name: " + Environment.MachineName + " Error: " + er.Message.ToString())); }
 
-            addUserLogin(labelUser.Text, textBox1.Text);
+            addUserLogin(textBoxUser.Text, textBox1.Text);
 
 
             // string idNewticket3 = myGlpiLib.updateItemId("KnowbaseItem", idNewticket2, "KnowbaseItemCategory", idcategory);
@@ -499,6 +500,7 @@ namespace ClientGlpi
 
         private void button3_Click(object sender, EventArgs e)
         {
+            button1.PerformClick();
             CreateTicket();
            
            // pictureBox2.Dispose();
@@ -515,8 +517,8 @@ namespace ClientGlpi
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.Text = this.Text+" Screen " +screenCount().ToString(); //Environment.UserName;
-
+            this.Text = this.Text;// +" Screen " +screenCount().ToString(); //Environment.UserName;
+            label7.Visible = false;
 
             string userini = settingFile.ReadINI("Auth", "User");
             string passini = settingFile.ReadINI("Auth", "Pass");
@@ -604,7 +606,8 @@ namespace ClientGlpi
         }
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
-        {            
+        {
+            closeForm = true;
             this.Close();
         }
 
@@ -615,14 +618,19 @@ namespace ClientGlpi
 
         private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-
+            this.WindowState = FormWindowState.Normal;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            e.Cancel = true;
-            this.WindowState = FormWindowState.Minimized;
+            if (!closeForm) e.Cancel = true;
+            //else e.Cancel = false;
+            else
+            {
+               
+                this.WindowState = FormWindowState.Minimized;
 
+            }
         }
     }
 }

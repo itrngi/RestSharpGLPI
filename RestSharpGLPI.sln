@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestSharpGLPI", "RestSharpGLPI\RestSharpGLPI.csproj", "{7F3AFBCC-931F-472C-94E0-9A63C038DC13}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestSharpGLPI0", "RestSharpGLPI\RestSharpGLPI0.csproj", "{7F3AFBCC-931F-472C-94E0-9A63C038DC13}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GLPILibNet", "GLPILibNet\GLPILibNet.csproj", "{FB949347-FF18-4F30-8B54-982AB0279F5B}"
 EndProject
@@ -22,7 +22,6 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7F3AFBCC-931F-472C-94E0-9A63C038DC13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7F3AFBCC-931F-472C-94E0-9A63C038DC13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F3AFBCC-931F-472C-94E0-9A63C038DC13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F3AFBCC-931F-472C-94E0-9A63C038DC13}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FB949347-FF18-4F30-8B54-982AB0279F5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
