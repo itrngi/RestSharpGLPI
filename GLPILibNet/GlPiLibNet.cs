@@ -140,7 +140,7 @@ namespace GlPiLibNet
         public string loginGlpi()
 
         {
-          //  loginGlpiSA();
+            loginGlpiSA();
             Console.WriteLine(string.Concat("loginGlpi()"));
             string result = string.Empty;
            /* this.UserName = user;
@@ -200,7 +200,7 @@ namespace GlPiLibNet
        // public void closeSession(string getsession)
              public void closeSession()
         {
-           // closeSessionSA();
+            closeSessionSA();
             Console.WriteLine(string.Concat("closeSession()"));
             string _UriT = this.GLPIurl + "/killSession/";
             var clientses = new RestClient(_UriT);

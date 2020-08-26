@@ -1016,5 +1016,10 @@ namespace RestSharpGLPI
             string idNewticket3 = myGlpiLib.updateItemId(textBox11.Text, textBox15.Text, textBox6.Text, textBox7.Text, textBox8.Text, textBox12.Text, false);
             richTextBox1.Text = idNewticket3;
         }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

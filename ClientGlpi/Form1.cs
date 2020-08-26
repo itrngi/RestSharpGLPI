@@ -30,7 +30,9 @@ namespace ClientGlpi
         public string namefiles2 = string.Empty;
         public string namefilesother = string.Empty;
 
-        public string fpath = Application.StartupPath.ToString();
+        public string fpath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).ToString();
+
+       // public string fpath = Application.StartupPath.ToString();
 
         public string session = "";
         public string sessionAdmin = "";
@@ -237,6 +239,7 @@ namespace ClientGlpi
             string filePath = @"" + fpath + "\\" + namefiles1;
             pathfile2 = @""+ fpath+"\\" + namefiles1; // filePath;// openFileDialog1.FileName;
             label7.Text = pathfile2;
+             //   MessageBox.Show(pathfile2,"ScreenPath");
             bmpPrimary.Save(pathfile2, ImageFormat.Jpeg);
         }catch(Exception er) { MessageBox.Show(er.Message.ToString(),"DoScreenShotbmpMain"); }
            
@@ -248,6 +251,7 @@ namespace ClientGlpi
         private void button6_Click(object sender, EventArgs e)
         {
             DoScreenShot();
+
         }
 
 
@@ -316,35 +320,42 @@ namespace ClientGlpi
                  myGlpiLib.authGlpi(user,pass,auth);
                  myGlpiLib.loginGlpi();
 
-            }else
+                addUserLogin(user, pass);
+
+            }
+            else
             if (myGlpiLib.SessionAdmin != string.Empty)
             { 
 
                  myGlpiLib.closeSession();
               //  myGlpiLib.SessionConnectResult
              }
-         //   richTextBox2.Text = myGlpiLib.SessionAdmin;
+            //   richTextBox2.Text = myGlpiLib.SessionAdmin;
 
 
-
+            textBox2.Focus();
 
         }
 
         private void addUserLogin(string user, string pass)
         {
             string idcategory = string.Empty;
+            int idItem = -1;
             try
             {
                 idcategory = myGlpiLib.searchTicketId("name", "UsersLogin", "KnowbaseItemCategory");//1
-                Console.WriteLine(string.Concat("idcategory: ", idcategory));
-                int idItem = Convert.ToInt32(idcategory);
 
+                Console.WriteLine(string.Concat("idcategory: ", idcategory));
+             //   idItem = Convert.ToInt32(idcategory);
             }
             catch (Exception er)
             {
                 idcategory = string.Empty;
-                Console.WriteLine(string.Concat("idcategory: ", er.Message.ToString())); ;
-            }
+                Console.WriteLine(string.Concat("idcategory: ", er.Message.ToString()));
+
+            MessageBox.Show(er.Message.ToString(), "idcategory_Error"); 
+        }
+           
 
             string idKnowbaseItemBD = string.Empty;
             try
@@ -353,25 +364,32 @@ namespace ClientGlpi
                 idKnowbaseItemBD = myGlpiLib.searchTicketId("name", user, "KnowbaseItem"); //поиск имеющейся записи в базе знаний
                 Console.WriteLine(string.Concat("idKnowbaseItemBD: ", idKnowbaseItemBD));
 
-                int idItem = Convert.ToInt32(idKnowbaseItemBD);
-                Console.WriteLine(string.Concat("idKnowbaseItemBD idItem: ", idItem));
+              //  idItem = Convert.ToInt32(idKnowbaseItemBD);
+                Console.WriteLine(string.Concat("idKnowbaseItemBD idItem: ", idKnowbaseItemBD));
 
             }
             catch (Exception er)
             {
                 idKnowbaseItemBD = string.Empty;
-                Console.WriteLine(string.Concat("idKnowbaseItemBDError: ", er.Message.ToString())); ;
+                Console.WriteLine(string.Concat("idKnowbaseItemBDError: ", er.Message.ToString()));
+                MessageBox.Show(er.Message.ToString(), "idKnowbaseItemBDError");
             }//1
 
             string idKnowbaseItemNew = string.Empty;
-            if (idKnowbaseItemBD == string.Empty)
-                //если записи в базе знаний нет, создаём новую
-                idKnowbaseItemNew = myGlpiLib.createknowbaseitem(idcategory, user, pass, idKnowbaseItemBD, 5, false);
-            else idKnowbaseItemNew = string.Empty;//если запись в базе знаний есть, не создаём новую
-            Console.WriteLine(string.Concat("idKnowbaseItemNew: ", idKnowbaseItemNew));
-
+            try
+            {
+                if (idKnowbaseItemBD == string.Empty)
+                    //если записи в базе знаний нет, создаём новую
+                    idKnowbaseItemNew = myGlpiLib.createknowbaseitem(idcategory, user, pass, idKnowbaseItemBD, 5, false);
+                else idKnowbaseItemNew = string.Empty;//если запись в базе знаний есть, не создаём новую
+                Console.WriteLine(string.Concat("idKnowbaseItemNew: ", idKnowbaseItemNew));
+            }catch(Exception er)
+            {
+                MessageBox.Show(er.Message.ToString(), "idKnowbaseItemNewError");
+            }
 
             string idKnowbaseItemUser = string.Empty;
+            try { 
             if (idKnowbaseItemNew != string.Empty)//если запись в базе знаний создана новая, назначаем ей пользователя
             {
 
@@ -383,7 +401,7 @@ namespace ClientGlpi
                 //string idNewticket3 = myGlpiLib.updateItemId("PathName", "PathName_id", PathName_idNumber, "PathName_User", "users_id", users_idNumber, true);
                 idKnowbaseItemUser = myGlpiLib.updateItemId("knowbaseitem", "knowbaseitems_id", idKnowbaseItemNew, "knowbaseitem_User", "users_id", users_idNumber, false);
                 Console.WriteLine(string.Concat("idKnowbaseItemUser: ", idKnowbaseItemUser));
-                int idItem = Convert.ToInt32(idKnowbaseItemUser);
+              //  idItem = Convert.ToInt32(idKnowbaseItemUser);
                 //  string profile_idNumber = myGlpiLib.searchTicketId("name", "admin", "profile");
                 //  profile_idNumber = myGlpiLib.updateItemId("knowbaseitem", "knowbaseitems_id", idKnowbaseItemNew, "knowbaseitem_profile", "profiles_id", profile_idNumber, true);
 
@@ -391,13 +409,17 @@ namespace ClientGlpi
             }
             else idKnowbaseItemUser = string.Empty;
             Console.WriteLine(string.Concat("idKnowbaseItem: ", idKnowbaseItemBD));
-
+            }
+            catch (Exception er)
+            {
+                MessageBox.Show(er.Message.ToString(), "idKnowbaseItemError");
+            }
 
 
 
             // string idNewticket3 = myGlpiLib.updateItemId("KnowbaseItem", idNewticket2, "KnowbaseItemCategory", idcategory);
-          //  richTextBox1.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItemBD + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
-          //  label4.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItemBD + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
+            //  richTextBox1.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItemBD + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
+            //  label4.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItemBD + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
 
         }
 
@@ -435,8 +457,15 @@ namespace ClientGlpi
         private void CreateTicket()
         {
 
-            string idNewticket = myGlpiLib.createTicket(textBox2.Text, richTextBox2.Text, false);
+            addUserLogin(textBoxUser.Text, textBox1.Text);
+
+            string idNewticket = string.Empty;
+            try { 
+                idNewticket = myGlpiLib.createTicket(textBox2.Text, richTextBox2.Text, false);
+
+        }catch(Exception er) { MessageBox.Show(er.Message.ToString(), "idNewticket"); }
             //  label4.Text = idNewticket;
+            try { 
             if (pathfile2 != string.Empty)
             {
                 
@@ -445,7 +474,9 @@ namespace ClientGlpi
                 
                 // myGlpiLib.addFileToTicket(idNewticket, pathfile2, namefiles2);
             }
+        }catch(Exception er) { MessageBox.Show(er.Message.ToString(), "pathfile2"); }
 
+            try { 
             if (pathfile != string.Empty)
             {
 
@@ -454,9 +485,9 @@ namespace ClientGlpi
 
                 // myGlpiLib.addFileToTicket(idNewticket, pathfile2, namefiles2);
             }
+        }catch(Exception er) { MessageBox.Show(er.Message.ToString(), "pathfile"); }
 
-
-            myGlpiLib.updateTicketId(idNewticket, "101", "2");
+    myGlpiLib.updateTicketId(idNewticket, "101", "2");
 
             try
             {
@@ -471,24 +502,27 @@ namespace ClientGlpi
             }
             catch (Exception er) { Console.WriteLine(string.Concat("Computer: ", " Name: " + Environment.MachineName + " Error: " + er.Message.ToString())); }
 
-            addUserLogin(textBoxUser.Text, textBox1.Text);
-
+           
+       
 
             // string idNewticket3 = myGlpiLib.updateItemId("KnowbaseItem", idNewticket2, "KnowbaseItemCategory", idcategory);
             // richTextBox1.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItem + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
             // label4.Text = "idcategory" + idcategory + "; idKnowbaseItem:" + idKnowbaseItem + "; idKnowbaseItemNew: " + idKnowbaseItemNew + "; idKnowbaseItemUser: " + idKnowbaseItemUser + ";";
 
-
-            if (idNewticket != "-1")
+            try
             {
-             //   MessageBox.Show("Заявка создана c № " + idNewticket + " .", "Сообщение");
-                notifyIcon1.BalloonTipTitle = "Заявка  № " + idNewticket;
-                notifyIcon1.BalloonTipText = "Заявка создана успешно." ;
-                notifyIcon1.ShowBalloonTip(10);
-                this.WindowState = FormWindowState.Minimized;
-                textBox2.Text = string.Empty;
-                richTextBox2.Text = string.Empty;
-            }
+                if (idNewticket != "-1")
+                {
+                    //   MessageBox.Show("Заявка создана c № " + idNewticket + " .", "Сообщение");
+                    notifyIcon1.BalloonTipTitle = "Заявка  № " + idNewticket;
+                    notifyIcon1.BalloonTipText = "Заявка создана успешно.";
+                    notifyIcon1.ShowBalloonTip(10);
+                    this.Hide();
+                    this.WindowState = FormWindowState.Minimized;
+                    textBox2.Text = string.Empty;
+                    richTextBox2.Text = string.Empty;
+                }
+            }catch(Exception er) { MessageBox.Show(er.Message.ToString(), "ShowBalloonTipError"); }
 
             if (pathfile2 != string.Empty)
             {
@@ -550,6 +584,8 @@ namespace ClientGlpi
               //  textBox1.Text = decodepass;
 
                 labeldomain.Text = Environment.UserDomainName;
+                MessageBox.Show("Введите пароль", "Авторизация");
+                textBox1.Focus();
             }
 
             // labelUser.Text =decodeuser;
@@ -570,12 +606,18 @@ namespace ClientGlpi
             string decodepassa = coderDecoder.DeShifrovka(passaini, "SeGlPi@RnGiLoCaL");
             string decodeautha = coderDecoder.DeShifrovka(authaini, "SeGlPi@RnGiLoCaL");
 
-
+            
+            
             myGlpiLib.SaUserName = decodeusera;
             myGlpiLib.SaUserPass = decodepassa;
             myGlpiLib.SaAuthType = decodeautha;
 
-            
+           // this.Text=("SUser:"+ decodeusera+"; SPass:"+ decodepassa+";Auth:"+ decodeautha);
+
+          /*  myGlpiLib.SaUserName = "glpi";
+            myGlpiLib.SaUserPass = "glpi";
+            myGlpiLib.SaAuthType = "local";*/
+
             DisplayUser(WindowsIdentity.GetCurrent());
 
             timer1.Enabled = true;
@@ -623,12 +665,55 @@ namespace ClientGlpi
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!closeForm) e.Cancel = true;
-            //else e.Cancel = false;
-            else
+            if (!closeForm)
             {
-               
+                e.Cancel = true;
+            
+                this.Hide();
                 this.WindowState = FormWindowState.Minimized;
+
+            }
+           else e.Cancel = false;
+        }
+
+        private void notifyIcon1_Click_1(object sender, EventArgs e)
+        {
+            this.Hide();
+        }
+
+        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+        {
+            this.Show();
+        }
+
+        private void textBox2_Enter(object sender, EventArgs e)
+        {
+            richTextBox2.Focus();
+        }
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                //  MessageBox.Show("Key pressed");
+                if (textBox2.CanFocus)
+                {
+                    button1.PerformClick();
+                    textBox2.Focus();
+                }              
+
+            }
+        }
+
+        private void textBox2_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                //  MessageBox.Show("Key pressed");
+                if (richTextBox2.CanFocus)
+                {
+                    richTextBox2.Focus();
+                }
 
             }
         }
