@@ -731,6 +731,8 @@ namespace RestSharpGLPI
            // getDocumentId("24");
           //  getTicketId(textBox5.Text);
             richTextBox1.Text = myGlpiLib.getJsonString(textBox5.Text, Convert.ToInt32(numericUpDown1.Value), textBox9.Text);
+          //  richTextBox1.Text = myGlpiLib.getJsonString("Ticket", 0, null);
+
         }
 
         void openFile(string dir, string file)

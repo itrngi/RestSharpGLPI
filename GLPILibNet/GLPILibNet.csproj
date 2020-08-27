@@ -80,6 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassTicket.cs" />
     <Compile Include="ClassUsers.cs" />
     <Compile Include="GlPiLibNet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

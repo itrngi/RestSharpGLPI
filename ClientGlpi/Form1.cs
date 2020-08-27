@@ -587,6 +587,15 @@ namespace ClientGlpi
                 MessageBox.Show("Введите пароль", "Авторизация");
                 textBox1.Focus();
             }
+            /*
+            textBox1.Text = decodepass;
+            textBoxUser.Text = Environment.UserName.ToLower();
+            labeldomain.Text = decodeauth;
+
+            myGlpiLib.UserName = decodeuser;
+            myGlpiLib.UserPass = decodepass;
+            myGlpiLib.AuthType = decodeauth;
+            */
 
             // labelUser.Text =decodeuser;
             //  textBox1.Text = decodepass;
@@ -716,6 +725,15 @@ namespace ClientGlpi
                 }
 
             }
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            MyTickets myTickets = new MyTickets();
+            myTickets.userMain = textBoxUser.Text;
+            myTickets.passMain = textBox1.Text;
+            myTickets.authMain = labeldomain.Text;
+            myTickets.Show();
         }
     }
 }

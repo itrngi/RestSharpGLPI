@@ -17,6 +17,7 @@ using System.Text.Json;
 using static System.Net.Mime.MediaTypeNames;
 using System.Collections.Generic;
 using GLPILibNet;
+using System.Text.RegularExpressions;
 
 namespace GlPiLibNet
 {
@@ -350,6 +351,48 @@ namespace GlPiLibNet
              sessionConnect(session);*/
         }
 
+        public string getTicketsJsonString(string pathurl, int idItem, string itemPath)
+        {
+            loginGlpi();
+           // loginGlpiSA();
+            Console.WriteLine(string.Concat("getJsonString()"));
+            // loginGlpi();
+            string _UriT = this.GLPIurl;// + idDOc;
+
+            var clientses = new RestClient(_UriT);
+
+            //  clientses.Authenticator = new HttpBasicAuthenticator(Properties.Settings.Default.GLPI_USER, Properties.Settings.Default.GLPI_PASS);
+            clientses.AddDefaultHeader("Content-Type", "application/json");
+
+             clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
+          //  clientses.AddDefaultHeader("Session-Token", this.SaSession);
+
+
+            clientses.AddDefaultHeader("App-Token", this.AppTocken);
+            //http://192.168.16.12:81/apirest.php/Document/24/Document_Item/"}]}
+            //var requestses = new RestRequest("Ticket/" + idDOc + "/Document_Item/", Method.GET);
+            var requestses = new RestRequest(pathurl + "/" + idItem + "/", Method.GET);
+            if (idItem != -1 || idItem != 0)
+                requestses = new RestRequest(pathurl + "/" + idItem + "/" + itemPath, Method.GET);
+            if (idItem == -1 || idItem == 0)
+                requestses = new RestRequest(pathurl + "/", Method.GET);
+
+            //  client.Execute(request);
+            IRestResponse responsesesg = clientses.Execute(requestses);
+
+            string resultJson = responsesesg.Content.ToString();
+
+            //label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+             closeSession();
+          //  closeSessionSA();
+            return resultJson;
+            /* var details = Json.JsonParser.FromJson(textBox1.Text);
+             session = details["session_token"].ToString();
+             Console.WriteLine(string.Concat("session_token: ", details["session_token"]));
+             textBox1.Text = session;// response.Content.ToString();
+             sessionConnect(session);*/
+        }
+
         public List<ClassUsers> parseJSONUserArray(string jsonArray)
         {
             Console.WriteLine(string.Concat("parseJSONUserArray()"));
@@ -420,9 +463,179 @@ namespace GlPiLibNet
            closeSessionSA();
               return usersGlpi;
         }
-    
-        
-       
+
+
+        public List<ClassTicket> getListTickets(string jsonArray)
+        {
+            Console.WriteLine(string.Concat("getListTickets()"));
+            List<string> usersGlpi = new List<string>();
+            List<ClassTicket> listToBind = new List<ClassTicket>();
+
+            string res = "";
+            var jsonString = @"[{""id"":""15"",""Name"":""West Wind"",
+                        ""message"":""text""}]";
+            // jsonArray = jsonString;
+            JArray jsonVal = JArray.Parse(jsonArray) as JArray;
+            dynamic stringsJson = jsonVal;
+            try
+            {
+                foreach (dynamic stringJson in stringsJson)
+                {
+                    string id = stringJson.id;
+                    string name = stringJson.name;
+                    string content = stringJson.content;
+                    //  string email = stringJson.email;
+                    string realname = stringJson.realname;
+                    string firstname = stringJson.firstname;
+                    string date = stringJson.date;
+
+
+                    //  label5.Text = name.ToString();
+                    // res = name;
+                    //  usersGlpi.Add(name + " : " + company);
+
+                    //this.listBox1.DataSource = usersGlpi;
+
+                    listToBind.Add(new ClassTicket(id, date+": "+name, content, realname, firstname,date));
+                }
+            }
+            catch (Exception er)
+            {
+                // MessageBox.Show(er.Message.ToString(), "parseJSONUserArray");
+                listToBind.Add(new ClassTicket("getListTickets: ", er.Message.ToString(), null, null, null,null));
+            }
+            // listBox1.DataSource = usersGlpi;
+
+
+            return listToBind;
+        }
+
+
+        public string parseJSONParam(string jsonSTR,string param)
+        {
+            string result = string.Empty;
+            string result2 = string.Empty;
+
+            string name = string.Empty;
+            string company = string.Empty;
+            string content = string.Empty;
+
+            try
+            {
+                Console.WriteLine(string.Concat("parseJSONParam()"));
+                /*   var jsonString = @"{""id"":""15"",""Name"":""West Wind"",
+                               ""message"":""text""}";
+                   */
+                dynamic json = JValue.Parse(jsonSTR);
+
+                // values require casting
+                name = json.id;
+                company = json.Name;
+                content = json.Content;
+                // label5.Text = name;
+                if (param == "id") result2 = json.id;
+                if (param == "name") result2 = json.name;
+                if (param == "status") result2 = json.status;
+                if (param == "users_id_recipient") result2 = json.users_id_recipient;
+                if (param == "content") result2 = json.content;
+                if (param == "date_creation") result2 = json.date_creation;
+                result = Regex.Replace(result2, @"<[^>]+>|&nbsp;|p&gt;|&lt;|/", string.Empty);
+
+                /*  if (param == "id") result = json.id;
+                  if (param == "id") result = json.id;
+                  if (param == "id") result = json.id;*/
+
+            }
+            catch (Exception er) { result = "ERROR parseJSONParam: " + er.Message.ToString() + " [" + jsonSTR + "]"; }
+
+            Console.WriteLine(string.Concat("parseJSONParam: ", result));
+            return result;
+        }
+
+        public string parseJSONArrayParam(string jsonArray, string param)
+        {
+            Console.WriteLine(string.Concat("parseJSONArrayParam()"));
+            string result = string.Empty;
+            string result2 = string.Empty;
+
+            try
+            {
+                var jsonString = @"{""id"":""15"",""Name"":""West Wind"",
+                        ""message"":""text""}";
+
+                JArray jsonVal = JArray.Parse(jsonArray) as JArray;
+                dynamic stringsJson = jsonVal;
+                Console.WriteLine(string.Concat("parseJSONArrayParam jsonArray: ", jsonArray));
+
+                foreach (dynamic stringJson in stringsJson)
+                {
+                    Console.WriteLine(string.Concat("parseJSONArrayParam stringJson.id: ", stringJson.id));
+
+                    string name = stringJson.id;
+                    string company = stringJson.Name;
+                    //  label5.Text = name;
+
+                    if (param == "id") result2 = stringJson.id;
+                    if (param == "name") result2 = stringJson.name;
+                    if (param == "status") result2 = stringJson.status;
+                    if (param == "users_id_recipient") result2 = stringJson.users_id_recipient;
+                    if (param == "content") result2 = stringJson.content;
+                    if (param == "date_creation") result2 = stringJson.date_creation;
+                    result = Regex.Replace(result2, @"<[^>]+>|&nbsp;|p&gt;|&lt;|/", string.Empty);
+
+                    //  result = name;
+                }
+            }
+            catch (Exception er) { result = "ERROR parseJSONArrayParam: " + er.Message.ToString() + " [" + jsonArray + "]"; }
+            Console.WriteLine(string.Concat("parseJSOparseJSONArrayParamNArray: ", result));
+            return result;
+        }
+
+        public List<string> parseJSONArrayParamList(string jsonArray, string param)
+        {
+            List<string> listToBind = new List<string>();
+
+           
+            Console.WriteLine(string.Concat("parseJSONArrayParamList()"));
+            string result = string.Empty;
+            string result2 = string.Empty;
+
+            try
+            {
+                var jsonString = @"{""id"":""15"",""Name"":""West Wind"",
+                        ""message"":""text""}";
+
+                JArray jsonVal = JArray.Parse(jsonArray) as JArray;
+                dynamic stringsJson = jsonVal;
+                Console.WriteLine(string.Concat("parseJSONArrayParamList jsonArray: ", jsonArray));
+
+                foreach (dynamic stringJson in stringsJson)
+                {
+                    Console.WriteLine(string.Concat("parseJSONArrayParamList stringJson.id: ", stringJson.id));
+
+                    string name = stringJson.id;
+                    string company = stringJson.Name;
+                    //  label5.Text = name;
+
+                    if (param == "id") result2 = stringJson.id;
+                    if (param == "name") result2 = stringJson.name;
+                    if (param == "status") result2 = stringJson.status;
+                    if (param == "users_id_recipient") result2 = stringJson.users_id_recipient;
+                    if (param == "content") result2 = stringJson.date_mod + " : " + stringJson.content;
+                    if (param == "date_creation") result2 = stringJson.date_creation;
+                    //  result = name;
+                     result = Regex.Replace(result2, @"<[^>]+>|&nbsp;|p&gt;|&lt;|/", string.Empty);
+
+                    // listToBind.Add(result);
+                    listToBind.Add(result);
+
+
+                }
+            }
+            catch (Exception er) { result = "ERROR parseJSONArrayParamList: " + er.Message.ToString() + " [" + jsonArray + "]"; }
+            Console.WriteLine(string.Concat("parseJSONArrayParamList: ", result));
+            return listToBind;
+        }
 
         public string parseJSON(string jsonSTR)
         {
@@ -858,6 +1071,104 @@ namespace GlPiLibNet
             }
             finally {
                  closeSessionSA(); 
+            }
+            return result;
+
+            /* richTextBox1.Text = responsesesg.Content.ToString();
+
+             label6.Text = responsesesg.ResponseUri.ToString();// Content.ToString();
+             return responsesesg.Content.ToString();*/
+        }
+
+
+        public string addCommentTicketId(string idTicket, string userId, string content)
+        {
+            Console.WriteLine(string.Concat("addCommentTicketId()"));
+            loginGlpiSA();
+          //  loginGlpi();
+            string result = string.Empty;
+            string fileaddres = string.Empty;
+            string _UriT = string.Empty;
+            var idjson = "";
+            //создание заявки
+            try
+            {
+               
+
+                _UriT = this.GLPIurl;// + "/knowbaseitem/" + idTicket + "/knowbaseitem_User/";
+
+
+              //  _UriT = this.GLPIurl + "/Ticket/" + idTicket + "/ITILFollowup";
+
+               // string JsonStringCreate = "{\"input\":[{\"items_id\":\"" + idTicket + "\",\"users_id\":\"" + userId + "\",\"content\": \"" + content + "\"}]}";
+                string JsonStringCreate = "{\"input\":{\"itemtype\":\"Ticket\",\"items_id\":\"" + idTicket + "\",\"users_id\":\"" + userId + "\",\"content\":\"" + content + "\"}}";
+               // string JsonStringCreate = "{\"input\":{\"users_id\":\"" + userId + "\",\"content\": \"" + content + "\"}}";
+               // string JsonStringCreate = "{ \"input\": {\"" + "tickets_id" + "\" : \"" + idTicket + "\",\"" + "users_id" + "\": \"" + userId + "\" }}";
+
+                //  string JsonStringCreate = "{\"input\": {\"tickets_id\" : \"" + idTicket + "\",\"users_id\": \"" + userid + "\",\"type\": \"" + type + "\",\"use_notification\": \"1\"}}";
+
+                //  _UriT = this.GLPIurl + "/" + Path + "/" + idTicket +"/"+""+ Path + "_User";            
+
+                //  string JsonStringCreate = "{\"input\":{\"items_id\" : \"" + idTicket + "\",\"users_id\": \"" + userId + "\",\"content\": \"" + content+"\"}}";
+
+                //  string JsonStringCreate = "{ \"input\": [{ \"id\" : \""+ idTicket + "\" , \"\"" + fieldedit + "\" : \"" + value + "\"\" } ] }";
+                //
+                //  string JsonStringCreate = "{ \"input\": {\""+ idname + "\" : \"" + idTicket + "\",\"name\" : \"" + "test" + "\",\"knowbaseitems_id\":\"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\",\"users_id\":2,\"type\": \"3\" }}";
+                //  string JsonStringCreate = "{ \"input\": {\"item_id\" : \"" + idTicket + "\",\"" + fieldedit + "\": \"" + value + "\" }}";
+                // string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\""+fieldedit+"\": \"" + value + "\" }]}";
+
+                ///     string JsonStringCreate = "{\"input\": [{\"knowbaseitem_id\" : \"" + idTicket + "\",\"users_id\": \""+ userId + "\"}]}";
+                //string JsonStringCreate = "{ \"input\": {\"" + "knowbaseitem_id" + "\" : \"" + idTicket + "\",\"" + "users_id" + "\": \"" + userId + "\" }}";
+
+
+                //   ,\"links\":\"[{rel\":\"User\",\"href\":\"http://192.168.16.12:81/apirest.php/User/2 \"  }]
+                // ,\"users_id_recipient\":\"2\"
+                var clientses = new RestClient(_UriT);
+                clientses.AddDefaultHeader("Content-Type", "application/json");
+
+                clientses.AddDefaultHeader("Session-Token", this.SaSession);
+             //   clientses.AddDefaultHeader("Session-Token", this.SessionAdmin);
+
+                clientses.AddDefaultHeader("App-Token", this.AppTocken);
+
+
+              //   IRestRequest request = new RestRequest("", Method.POST, DataFormat.Json);
+                IRestRequest request = new RestRequest("Ticket/" + idTicket + "/ITILFollowup", Method.POST, DataFormat.Json);
+
+                request.AddHeader("Content-Type", "application/json; CHARSET=UTF-8");
+
+                Console.WriteLine("JsonStringCreate:");
+                Console.WriteLine(JsonStringCreate);
+
+                request.AddJsonBody(JsonStringCreate);
+                //  Console.WriteLine("AddJsonBody:");
+                // Console.WriteLine(request.Resource);
+
+                var response = clientses.Execute(request);
+                Console.WriteLine("addCommentTicketId:");
+                Console.WriteLine(response.Content.ToString());
+                string resultJson = response.Content.ToString();
+                // var details = Json.JsonParser.FromJson(label4.Text);
+                Console.WriteLine(string.Concat("addCommentTicketId_parse: ", resultJson));
+                idjson = parseJSONArray(resultJson);
+                //  idjson = parseJSON(resultJson);
+                //   label5.Text= idjson;
+                //  label6.Text = idjson.ToString();
+                result = "{\"addCommentTicketId_Update\": \"" + idjson + "\"}" + _UriT;
+
+            }
+            catch (Exception er)
+            {
+                Console.WriteLine(string.Concat("addCommentTicketId_Error: ", er.Message.ToString()));
+
+                result = "{\"addCommentTicketId_Error\": \"" + er.Message.ToString() + "\"}" + _UriT;
+                //   MessageBox.Show(er.Message.ToString(), "Ошибка заявки "); }
+                // label6.Text = result;
+            }
+            finally
+            {
+                closeSessionSA();
+              //  closeSession();
             }
             return result;
 
