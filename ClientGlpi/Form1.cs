@@ -250,8 +250,10 @@ namespace ClientGlpi
 
         private void button6_Click(object sender, EventArgs e)
         {
-            DoScreenShot();
-
+            this.Hide();
+            //  DoScreenShot();
+            timerScreenShot.Enabled = true;
+            timerScreenShot.Start();
         }
 
 
@@ -734,6 +736,15 @@ namespace ClientGlpi
             myTickets.passMain = textBox1.Text;
             myTickets.authMain = labeldomain.Text;
             myTickets.Show();
+        }
+
+        private void timerScreenShot_Tick(object sender, EventArgs e)
+        {
+           
+            DoScreenShot();
+            this.Show();
+            timerScreenShot.Stop();
+
         }
     }
 }

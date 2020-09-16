@@ -225,6 +225,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D7D5AA2669C9A9FEC2432E05C6156400"
+        "OwnerKey" = "8:_0205070FFA8E4E088CC03EFA7F1D5B3B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_D83B9BB40FED99C59C90FAAC69F79375"
         "OwnerKey" = "8:_0205070FFA8E4E088CC03EFA7F1D5B3B"
         "MsmSig" = "8:_UNDEFINED"
@@ -359,6 +365,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_D9CB41E829734791A60679F19882AD58"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_D7D5AA2669C9A9FEC2432E05C6156400"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1065,6 +1077,37 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D7D5AA2669C9A9FEC2432E05C6156400"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:System.Windows, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+                "ScatterAssemblies"
+                {
+                    "_D7D5AA2669C9A9FEC2432E05C6156400"
+                    {
+                    "Name" = "8:System.Windows.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:System.Windows.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_0B31F5CF84144551BA4B8621B31885B5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D83B9BB40FED99C59C90FAAC69F79375"
             {
             "AssemblyRegister" = "3:1"
@@ -1235,7 +1278,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ClientGlpi"
         "ProductCode" = "8:{1484D39B-DE4E-4A11-B354-0844EEC701A4}"
-        "PackageCode" = "8:{2EF09A24-E242-474A-AD3A-1D081DD02DE4}"
+        "PackageCode" = "8:{0F28BBA7-5C76-4EB8-8CF0-33B89092A30A}"
         "UpgradeCode" = "8:{75609219-A65D-4595-8217-BDFA02EF9914}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1367,6 +1410,20 @@
             "Folder" = "8:_4D8C572C785747B5BDFFA3B37F8348C8"
             "WorkingFolder" = "8:_0B31F5CF84144551BA4B8621B31885B5"
             "Icon" = "8:_6B11184084E3480E8F1EA1E5FEF1B443"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_DB27B62B7BFE4272A9299A01C4A4B86B"
+            {
+            "Name" = "8:Shortcut to User's Programs Menu"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_6118A3022F5A44828FCEA245A47A2C0F"
+            "Folder" = "8:_6118A3022F5A44828FCEA245A47A2C0F"
+            "WorkingFolder" = "8:_6118A3022F5A44828FCEA245A47A2C0F"
+            "Icon" = "8:"
             "Feature" = "8:"
             }
         }
